@@ -5,7 +5,7 @@ This project is a submission for the DSE Role.
 
 ## Usage
 1. Clone the repo
-2. Add your envirnement variables in a `.env.local` file (an example file has been provided). Credentials can be found [here](https://dashboard.tryfinch.com/), after creating an account. 
+2. Add your envirnement variables in a `.env.local` file (an example file has been provided). Credentials can be found [here](https://dashboard.tryfinch.com/), after creating an account. On the Dasbhaord, add `http://localhost:5000/authorize` to your Redirect URIs.
 3. Set up a vitual enviroment
 ```
     python3 -m venv venv
@@ -21,7 +21,7 @@ This project is a submission for the DSE Role.
 ```
 6. Navigate to `localhost:5000` in your browser to start connecting to providers.
 
-The app should be running on `localhost:5000`. If it is not, please update the `REDIRECT_URI` in `.env.local` accordingly.
+The app should be running on `localhost:5000`. If it is not, please update the `REDIRECT_URI` in `.env.local`and on the Dashboard accordingly.
 
 
 ## Features
