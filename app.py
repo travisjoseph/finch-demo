@@ -17,6 +17,14 @@ REDIRECT_URI = os.getenv("REDIRECT_URI")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_FILE_PATH = os.path.join(BASE_DIR, 'tokens.csv')
 
+def get_latest_access_token():
+    with open(CSV_FILE_PATH, mode='r', newline='', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        all_rows = list(reader)
+        if len(all_rows) < 2: 
+            return "Error: No token data found in file.", 500
+        return all_rows[-1][0]
+
 
 @app.route('/')
 def home():
@@ -88,17 +96,8 @@ def authorize():
 @app.route('/company')
 def company():
 
-    # Fetch the most recent access token from the .csv
-    access_token = None
-    with open(CSV_FILE_PATH, mode='r', newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        all_rows = list(reader)
-        if len(all_rows) < 2: 
-            return "Error: No token data found in file.", 500
-        access_token = all_rows[-1][0]
-
     client = Finch(
-        access_token=access_token,
+        access_token=get_latest_access_token(),
     )
 
     # Get compnay data, handles compatibility issues with custom message
@@ -122,17 +121,8 @@ def company():
 @app.route('/directory')
 def directory():
 
-    # Fetch the most recent access token from the .csv
-    access_token = None
-    with open(CSV_FILE_PATH, mode='r', newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        all_rows = list(reader)
-        if len(all_rows) < 2: 
-            return "Error: No token data found in file.", 500
-        access_token = all_rows[-1][0]
-
     client = Finch(
-        access_token=access_token,
+        access_token=get_latest_access_token(),
     )
 
     # Get individual data, handles compatibility issues with custom message
@@ -157,17 +147,8 @@ def directory():
 @app.route('/directory/employee/<employee_id>')
 def employee_detail(employee_id):
     
-    # Fetch the most recent access token from the .csv
-    access_token = None
-    with open(CSV_FILE_PATH, mode='r', newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        all_rows = list(reader)
-        if len(all_rows) < 2: 
-            return "Error: No token data found in file.", 500
-        access_token = all_rows[-1][0]
-
     client = Finch(
-        access_token=access_token,
+        access_token=get_latest_access_token(),
     )
 
     employment_data = None
