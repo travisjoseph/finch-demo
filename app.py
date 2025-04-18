@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, request, jsonify 
 from finch import Finch, APIError 
-import base64
 from dotenv import load_dotenv
 import os
 import uuid
