@@ -30,4 +30,5 @@ The app should be running on `localhost:5000`. If it is not, please update the `
 - Selecting an employee from the directory will display individual (personal) and employment information.
 - If a provider does not support a specific field (null/None), it will display as *unavailable*.
 - If a provider does not support an endpoint, a custom *unsupported for provider* error is displayed.
+- Connect scopes are limited to the endpoints required for this demo.
 - This app stores tokes in a `.csv` locally. **This is not inteded for production use**. If the tokens file does not exist, it will create one. If multiple providers are connected, the applicaiton will fetch data from the most recent provider by default. 
