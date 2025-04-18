@@ -2,6 +2,8 @@
 
 This project is a submission for the DSE Role.
 
+> Tested on Python 3.10.12 and assumes you have venv installed.
+
 
 ## Usage
 1. Clone the repo
@@ -9,16 +11,16 @@ This project is a submission for the DSE Role.
 3. On the Dasbhaord, add `http://localhost:5000/authorize` to your Redirect URIs.
 4. Set up a vitual enviroment
 ```
-    python3 -m venv venv
-    source venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 ```
 4. Install requirements
 ```
-    pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 5. Launch the application
 ```
-    python3 app.py
+python3 app.py
 ```
 6. Navigate to `localhost:5000` in your browser to start connecting to providers.
 
