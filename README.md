@@ -22,7 +22,7 @@ This project is a submission for the DSE Role.
 6. Navigate to `localhost:5000` in your browser to start connecting to providers.
 
 The app should be running on `localhost:5000`. If it is not, please update the `REDIRECT_URI` in `.env.local`and on the Dashboard accordingly.
-You can use demo credential found [here](https://developer.tryfinch.com/implementation-guide/Test/Finch-Sandbox#simulating-credential-flows) in order to connect to providers in Connect.
+You can use demo credentials found [here](https://developer.tryfinch.com/implementation-guide/Test/Finch-Sandbox#simulating-credential-flows) in order to connect to providers in Connect.
 
 
 ## Features
