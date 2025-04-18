@@ -1,5 +1,5 @@
-from flask import Flask, render_template, redirect, request, jsonify # <-- Added jsonify
-from finch import Finch, APIError # <-- Added APIError
+from flask import Flask, render_template, redirect, request, jsonify 
+from finch import Finch, APIError 
 import base64
 from dotenv import load_dotenv
 import os
@@ -54,7 +54,7 @@ def authorize():
         redirect_uri=REDIRECT_URI
     )
 
-    # For demo purposes, simply sorting tokens in a csv. On prod use a porper DB with encryption!
+    # Storing locally in a csv for demo purposes
     header = ['access_token', 'token_type', 'connection_id', 'customer_id',
               'account_id', 'client_type', 'company_id', 'connection_type',
               'products', 'provider_id']
@@ -82,7 +82,7 @@ def authorize():
             writer.writerow(header)
         writer.writerow(row_data)
 
-    # Redirect to logged-in route
+    # Redirect to company route
     return redirect('/company')
 
 @app.route('/company')
@@ -101,7 +101,7 @@ def company():
         access_token=access_token,
     )
 
-    # Get data, handles compatibility issues with custom message
+    # Get compnay data, handles compatibility issues with custom message
     company_data = None 
     error_message = None
     try:
@@ -135,7 +135,7 @@ def directory():
         access_token=access_token,
     )
 
-    # Get data, handles compatibility issues with custom message
+    # Get individual data, handles compatibility issues with custom message
     individuals = []
     error_message = None
     try:
