@@ -113,7 +113,7 @@ def company():
             error_message = "Could not load company data."
             print(f"{e}")
     except Exception as e:
-        error_message = "Could not load company data."
+        error_message = "Encountered an unexpected error."
         print(f"{e}")
 
     return render_template('company.html', company_data=company_data, error_message=error_message)
@@ -138,7 +138,7 @@ def directory():
             error_message = "Could not load directory data."
             print(f"{e}")
     except Exception as e:
-        error_message = "Could not load directory data."
+        error_message = "Encountered an unexpected error."
         print(f"{e}")
 
     return render_template('directory.html', directory_data=individuals, error_message=error_message)
@@ -171,7 +171,7 @@ def employee_detail(employee_id):
             employment_error = "Could not load employment data."
             print(f"{e}")
     except Exception as e:
-        employment_error = "Could not load employment data."
+        employment_error = "Encountered an unexpected error."
         print(f"{e}")
 
     # Get individual data, handles compatibility issues with custom message
@@ -192,7 +192,7 @@ def employee_detail(employee_id):
             individual_error = "Could not load individual data."
             print(f"{e}")
     except Exception as e:
-        individual_error = "Could not load individual data."
+        individual_error = "Encountered an unexpected error."
         print(f"{e}")
 
     return render_template('employee_detail.html',
