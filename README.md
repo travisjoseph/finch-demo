@@ -5,8 +5,9 @@ This project is a submission for the DSE Role.
 
 ## Usage
 1. Clone the repo
-2. Add your envirnement variables in a `.env.local` file (an example file has been provided). Credentials can be found [here](https://dashboard.tryfinch.com/), after creating an account. On the Dasbhaord, add `http://localhost:5000/authorize` to your Redirect URIs.
-3. Set up a vitual enviroment
+2. Add your envirnement variables in a `.env.local` file (an example file has been provided). Credentials can be found [here](https://dashboard.tryfinch.com/), after creating an account.
+3. On the Dasbhaord, add `http://localhost:5000/authorize` to your Redirect URIs.
+4. Set up a vitual enviroment
 ```
     python3 -m venv venv
     source venv/bin/activate
