@@ -1,0 +1,3 @@
+Flask
+finch-api
+python-dotenv

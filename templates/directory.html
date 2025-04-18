@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Directory</title>
+    <style>
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .inactive { color: #aaa; }
+        .unavailable {
+            color: red;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <a href="/company" style="display: inline-block; margin-bottom: 15px; padding: 8px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Return to Company</a>
+    <h1>Employee Directory</h1>
+
+    {% if error_message %}
+        <p class="unavailable" style="color: red; font-style: italic;">{{ error_message }}</p>
+    {% elif directory_data %}
+        <table id="employeeTable">
+            <thead>
+                <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Last Name</th>
+                <th>Department</th>
+                <th>Manager ID</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in directory_data %}
+            <tr class="{{ 'inactive' if not employee.is_active else '' }}">
+                <td><a href="/directory/employee/{{ employee.id }}">{{ employee.id }}</a></td>
+                <td>{{ employee.first_name }}</td>
+                <td>{% if employee.middle_name %}<span class="value">{{ employee.middle_name }}</span>{% else %}<span class="unavailable">unavailable</span>{% endif %}</td>
+                <td>{{ employee.last_name }}</td>
+                <td>{% if employee.department %}<span class="value">{{ employee.department.name }}</span>{% else %}<span class="unavailable">unavailable</span>{% endif %}</td>
+                <td>{% if employee.manager %}<span class="value">{{ employee.manager.id }}</span>{% else %}<span class="unavailable">unavailable</span>{% endif %}</td>
+                <td>{{ 'Yes' if employee.is_active else 'No' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="unavailable">No directory data found.</p>
+    {% endif %}
+
+    <script>
+        // Removed the filterTable function
+        // Removed the fetchEmploymentData function
+    </script>
+
+</body>
+</html>
