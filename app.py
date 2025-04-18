@@ -220,6 +220,5 @@ def employee_detail(employee_id):
                            individual_error=individual_error,
                            employment_error=employment_error)
 
-    return "hi", 200
 if __name__ == '__main__':
     app.run(debug=True)
