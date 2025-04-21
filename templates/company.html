@@ -41,8 +41,8 @@
 
     <a href="/directory" class="nav-button">View Directory</a>
 
-    {% if error %}
-        <p class="unavailable">Error loading data: {{ error }}</p>
+    {% if error_message %}
+        <p class="unavailable">Error loading data: {{ error_message }}</p>
     {% elif company_data %}
         <h2>General Details</h2>
         <ul>
