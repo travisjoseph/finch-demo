@@ -963,7 +963,7 @@
                 </div>
                 <div class="search-container">
                     <span class="search-icon">🔍</span>
-                    <input type="text" class="search-input" placeholder="Search employees..." id="searchInput">
+                    <input type="text" class="search-input" placeholder="Search by name, department, or employee ID..." id="searchInput">
                 </div>
             </div>
 
@@ -1050,6 +1050,7 @@
         <div class="drawer-tabs" id="drawerTabs">
             <button class="drawer-tab active" data-tab="overview">Overview</button>
             <button class="drawer-tab" data-tab="employment">Employment</button>
+            <button class="drawer-tab" data-tab="payments">Payments</button>
         </div>
         <div class="drawer-content" id="drawerContent">
             <div class="drawer-loading">
@@ -1071,7 +1072,8 @@
             rows.forEach(row => {
                 const name = row.getAttribute('data-name');
                 const department = row.getAttribute('data-department');
-                const isVisible = name.includes(searchTerm) || department.includes(searchTerm);
+                const employeeId = row.getAttribute('data-employee-id').toLowerCase();
+                const isVisible = name.includes(searchTerm) || department.includes(searchTerm) || employeeId.includes(searchTerm);
                 row.style.display = isVisible ? '' : 'none';
             });
         });
@@ -1226,6 +1228,53 @@
                         ${renderEmploymentTab(data)}
                     </div>
                 `;
+            } else if (tabName === 'payments') {
+                // Show loading state for payments
+                content.innerHTML = `
+                    <div class="drawer-loading">
+                        <div class="drawer-loading-spinner"></div>
+                        <p class="drawer-loading-text">Loading payment data...</p>
+                    </div>
+                `;
+                
+                // Fetch payment data
+                const employeeId = data.individual ? data.individual.id : null;
+                if (employeeId) {
+                    fetch(`/api/employee/${employeeId}/payments`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch payment data');
+                            }
+                            return response.json();
+                        })
+                        .then(paymentData => {
+                            content.innerHTML = `
+                                <div class="drawer-tab-content">
+                                    ${renderPaymentsTab(paymentData)}
+                                </div>
+                            `;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching payment data:', error);
+                            content.innerHTML = `
+                                <div class="drawer-error">
+                                    <div class="drawer-error-icon">!</div>
+                                    <div>
+                                        <strong>Error:</strong> Failed to load payment data. ${error.message}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                } else {
+                    content.innerHTML = `
+                        <div class="drawer-error">
+                            <div class="drawer-error-icon">!</div>
+                            <div>
+                                <strong>Error:</strong> No employee ID available for payment lookup.
+                            </div>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -1447,6 +1496,244 @@
                     <div class="info-value">${displayValue}</div>
                 </div>
             `;
+        }
+
+        function renderPaymentsTab(paymentData) {
+            if (paymentData.error) {
+                return `
+                    <div class="drawer-error">
+                        <div class="drawer-error-icon">!</div>
+                        <div>
+                            <strong>Error:</strong> ${paymentData.error}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let html = '<div class="info-cards">';
+
+            // Payment Summary Card
+            html += `
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon employment">💰</div>
+                        <h3 class="info-card-title">Payment Summary</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Total Payments</div>
+                            <div class="info-value">${paymentData.total_payments || 0}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Date Range</div>
+                            <div class="info-value">${paymentData.date_range || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Individual Payments
+            if (paymentData.payments && paymentData.payments.length > 0) {
+                paymentData.payments.forEach((payment, index) => {
+                    html += `
+                        <div class="info-card">
+                            <div class="info-card-header">
+                                <div class="info-card-icon personal">📄</div>
+                                <h3 class="info-card-title">Payment ${index + 1} - ${payment.pay_date || 'Date N/A'}</h3>
+                            </div>
+                    `;
+
+                    // Payment Period Info
+                    if (payment.pay_period) {
+                        html += `
+                            <div class="info-grid" style="margin-bottom: 16px;">
+                                <div class="info-item">
+                                    <div class="info-label">Pay Period Start</div>
+                                    <div class="info-value">${payment.pay_period.start_date || 'N/A'}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Pay Period End</div>
+                                    <div class="info-value">${payment.pay_period.end_date || 'N/A'}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Payment ID</div>
+                                    <div class="info-value" style="font-family: monospace; font-size: 12px;">${payment.payment_id}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Pay Statement Details
+                    if (payment.pay_statement_error) {
+                        html += `
+                            <div class="drawer-error" style="margin: 16px 0;">
+                                <div class="drawer-error-icon">!</div>
+                                <div>${payment.pay_statement_error}</div>
+                            </div>
+                        `;
+                    } else if (payment.pay_statement) {
+                        const stmt = payment.pay_statement;
+                        
+                        // Basic pay info
+                        html += `
+                            <div class="info-grid" style="margin-bottom: 16px;">
+                                <div class="info-item">
+                                    <div class="info-label">Gross Pay</div>
+                                    <div class="info-value">${formatCurrency(stmt.gross_pay)}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Net Pay</div>
+                                    <div class="info-value">${formatCurrency(stmt.net_pay)}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Total Hours</div>
+                                    <div class="info-value">${stmt.total_hours || 'N/A'}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Payment Method</div>
+                                    <div class="info-value">${stmt.payment_method || 'N/A'}</div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Earnings breakdown
+                        if (stmt.earnings && stmt.earnings.length > 0) {
+                            html += `
+                                <div style="margin-bottom: 16px;">
+                                    <div class="info-label">Earnings Breakdown</div>
+                                    <div style="margin-top: 8px;">
+                            `;
+                            
+                            stmt.earnings.forEach(earning => {
+                                html += `
+                                    <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #0ea5e9;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 500; color: #1e293b;">${earning.name || 'Unnamed'}</div>
+                                                <div style="font-size: 12px; color: #64748b;">${earning.type || 'N/A'}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-weight: 600; color: #1e293b;">${formatCurrency(earning)}</div>
+                                                ${earning.hours ? `<div style="font-size: 12px; color: #64748b;">${earning.hours} hours</div>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            
+                            html += '</div></div>';
+                        }
+
+                        // Taxes
+                        if (stmt.taxes && stmt.taxes.length > 0) {
+                            html += `
+                                <div style="margin-bottom: 16px;">
+                                    <div class="info-label">Taxes</div>
+                                    <div style="margin-top: 8px;">
+                            `;
+                            
+                            stmt.taxes.forEach(tax => {
+                                const taxType = tax.employer ? 'Employer' : 'Employee';
+                                html += `
+                                    <div style="background: #fef3c7; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #f59e0b;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 500; color: #1e293b;">${tax.name || 'Unnamed Tax'}</div>
+                                                <div style="font-size: 12px; color: #64748b;">${tax.type || 'N/A'} (${taxType})</div>
+                                            </div>
+                                            <div style="font-weight: 600; color: #1e293b;">${formatCurrency(tax)}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            
+                            html += '</div></div>';
+                        }
+
+                        // Employee Deductions
+                        if (stmt.employee_deductions && stmt.employee_deductions.length > 0) {
+                            html += `
+                                <div style="margin-bottom: 16px;">
+                                    <div class="info-label">Employee Deductions</div>
+                                    <div style="margin-top: 8px;">
+                            `;
+                            
+                            stmt.employee_deductions.forEach(deduction => {
+                                const taxStatus = deduction.pre_tax ? 'Pre-tax' : 'Post-tax';
+                                html += `
+                                    <div style="background: #fce7f3; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #ec4899;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 500; color: #1e293b;">${deduction.name || 'Unnamed Deduction'}</div>
+                                                <div style="font-size: 12px; color: #64748b;">${deduction.type || 'N/A'} (${taxStatus})</div>
+                                            </div>
+                                            <div style="font-weight: 600; color: #1e293b;">${formatCurrency(deduction)}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            
+                            html += '</div></div>';
+                        }
+
+                        // Employer Contributions
+                        if (stmt.employer_contributions && stmt.employer_contributions.length > 0) {
+                            html += `
+                                <div style="margin-bottom: 16px;">
+                                    <div class="info-label">Employer Contributions</div>
+                                    <div style="margin-top: 8px;">
+                            `;
+                            
+                            stmt.employer_contributions.forEach(contribution => {
+                                html += `
+                                    <div style="background: #dcfce7; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #22c55e;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 500; color: #1e293b;">${contribution.name || 'Unnamed Contribution'}</div>
+                                                <div style="font-size: 12px; color: #64748b;">${contribution.type || 'N/A'}</div>
+                                            </div>
+                                            <div style="font-weight: 600; color: #1e293b;">${formatCurrency(contribution)}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            
+                            html += '</div></div>';
+                        }
+                    }
+
+                    html += '</div>';
+                });
+            } else {
+                html += `
+                    <div class="info-card">
+                        <div class="empty-state" style="padding: 40px 20px;">
+                            <h3>No Payment Data</h3>
+                            <p>No payment records found for this employee in the selected date range.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function formatCurrency(moneyObject) {
+            if (!moneyObject || (!moneyObject.amount && moneyObject.amount !== 0)) {
+                return 'N/A';
+            }
+            
+            const amount = moneyObject.amount;
+            const currency = moneyObject.currency || 'USD';
+            
+            // Convert cents to dollars for display (assuming amount is in cents)
+            const dollars = amount / 100;
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency.toUpperCase()
+            }).format(dollars);
         }
 
         // Close drawer on Escape key

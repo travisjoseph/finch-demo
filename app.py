@@ -97,12 +97,19 @@ def home():
     connection_details = []
     for conn in connections:
         details = get_connection_details(conn['access_token'])
+        
+        # Check if connection has payroll scopes
+        products = conn.get('products', '').split('|') if conn.get('products') else []
+        has_payroll = 'payment' in products and 'pay_statement' in products
+        
         connection_details.append({
             'connection_id': conn['connection_id'],
             'provider_id': conn['provider_id'],
             'company_name': details['company_name'],
             'status': details['status'],
-            'is_active': conn.get('active') == 'True' or (active_conn and conn['connection_id'] == active_conn['connection_id'])
+            'is_active': conn.get('active') == 'True' or (active_conn and conn['connection_id'] == active_conn['connection_id']),
+            'has_payroll': has_payroll,
+            'products': products
         })
     
     return render_template('index.html', connections=connection_details)
@@ -134,6 +141,58 @@ def connect():
 
     return redirect(response.connect_url)
 
+@app.route('/reauth/<connection_id>')
+def reauth(connection_id):
+    """Reauthenticate a connection with additional payroll scopes"""
+    # Include payroll scopes for accessing payment and pay statement data
+    scopes = ["company", "directory", "individual", "employment", "payment", "pay_statement"]
+    
+    client = Finch(
+        client_id= CLIENT_ID,
+        client_secret= CLIENT_SECRET
+    )
+
+    try:
+        response = client.connect.sessions.reauthenticate(
+            connection_id=connection_id,
+            products=scopes,
+            redirect_uri=REDIRECT_URI
+        )
+        return redirect(response.connect_url)
+    except Exception as e:
+        print(f"Reauth error: {e}")
+        return redirect('/')
+
+@app.route('/introspect')
+def introspect():
+    """Debug endpoint to see current connection details and scopes"""
+    client = Finch(
+        access_token=get_latest_access_token(),
+    )
+    
+    try:
+        introspection = client.account.introspect()
+        print("\n" + "="*80)
+        print("CONNECTION INTROSPECTION")
+        print("="*80)
+        print(f"Connection ID: {introspection.connection_id}")
+        print(f"Provider ID: {introspection.provider_id}")
+        print(f"Current Products: {introspection.products}")
+        print(f"Connection Status: {introspection.connection_status.status if introspection.connection_status else 'Unknown'}")
+        print(f"Full Introspection: {introspection}")
+        
+        return jsonify({
+            'connection_id': introspection.connection_id,
+            'provider_id': introspection.provider_id,
+            'products': introspection.products,
+            'connection_status': introspection.connection_status.status if introspection.connection_status else None,
+            'message': 'Connection details logged to server console'
+        })
+    except Exception as e:
+        error_msg = f"Error introspecting connection: {e}"
+        print(f"INTROSPECT ERROR: {error_msg}")
+        return jsonify({'error': error_msg}), 500
+
 @app.route('/authorize')
 def authorize():
     auth_code = request.args.get('code')
@@ -153,40 +212,73 @@ def authorize():
               'products', 'provider_id', 'active']
 
     products_str = "|".join(create_access_token_response.products)
+    connection_id = create_access_token_response.connection_id
 
-    # Set new connection as active, deactivate others
+    # Check if this connection already exists (reauthentication case)
     file_exists = os.path.exists(CSV_FILE_PATH)
-    if file_exists:
-        # Deactivate existing connections
-        connections = get_all_connections()
-        for conn in connections:
-            conn['active'] = 'False'
+    connections = get_all_connections() if file_exists else []
+    
+    existing_connection_index = None
+    for i, conn in enumerate(connections):
+        if conn['connection_id'] == connection_id:
+            existing_connection_index = i
+            break
+    
+    if existing_connection_index is not None:
+        # Update existing connection with new token and products
+        print(f"Updating existing connection: {connection_id}")
+        connections[existing_connection_index].update({
+            'access_token': create_access_token_response.access_token,
+            'token_type': create_access_token_response.token_type,
+            'products': products_str,
+            'active': 'True'
+        })
         
-        # Write back existing connections
+        # Deactivate other connections
+        for i, conn in enumerate(connections):
+            if i != existing_connection_index:
+                conn['active'] = 'False'
+        
+        # Write back all connections
         with open(CSV_FILE_PATH, mode='w', newline='', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
             writer.writeheader()
             writer.writerows(connections)
+    else:
+        # New connection - add it
+        print(f"Adding new connection: {connection_id}")
+        
+        # Deactivate existing connections
+        for conn in connections:
+            conn['active'] = 'False'
+        
+        # Write back existing connections first
+        if connections:
+            with open(CSV_FILE_PATH, mode='w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=header)
+                writer.writeheader()
+                writer.writerows(connections)
 
-    row_data = [
-        create_access_token_response.access_token,
-        create_access_token_response.token_type,
-        create_access_token_response.connection_id,
-        create_access_token_response.customer_id,
-        create_access_token_response.account_id,
-        create_access_token_response.client_type,
-        create_access_token_response.company_id,
-        create_access_token_response.connection_type,
-        products_str,
-        create_access_token_response.provider_id,
-        'True'  # New connection is active
-    ]
-    
-    with open(CSV_FILE_PATH, mode='a', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        if not file_exists:
-            writer.writerow(header)
-        writer.writerow(row_data)
+        # Add new connection
+        row_data = [
+            create_access_token_response.access_token,
+            create_access_token_response.token_type,
+            create_access_token_response.connection_id,
+            create_access_token_response.customer_id,
+            create_access_token_response.account_id,
+            create_access_token_response.client_type,
+            create_access_token_response.company_id,
+            create_access_token_response.connection_type,
+            products_str,
+            create_access_token_response.provider_id,
+            'True'  # New connection is active
+        ]
+        
+        with open(CSV_FILE_PATH, mode='a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            if not file_exists:
+                writer.writerow(header)
+            writer.writerow(row_data)
 
     # Redirect to company route
     return redirect('/company')
@@ -355,5 +447,113 @@ def api_employee_detail(employee_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/employee/<employee_id>/payments')
+def api_employee_payments(employee_id):
+    """API endpoint that returns payment data for a specific employee"""
+    try:
+        client = Finch(
+            access_token=get_latest_access_token(),
+        )
+        
+        # Get payments for the last 90 days to have a good range
+        from datetime import datetime, timedelta
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')
+        
+        # Get all payments
+        payments = client.hris.payments.list(
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        employee_payments = []
+        
+        # Filter payments that include this employee
+        for payment in payments:
+            if payment.individual_ids and employee_id in payment.individual_ids:
+                # Get pay statements for this payment
+                try:
+                    pay_statement_response = client.hris.pay_statements.retrieve_many(
+                        requests=[{
+                            "payment_id": payment.id
+                        }]
+                    )
+                    
+                    # Find the pay statement for this specific employee
+                    employee_pay_statement = None
+                    if (pay_statement_response.responses and 
+                        pay_statement_response.responses[0].body and 
+                        pay_statement_response.responses[0].body.pay_statements):
+                        
+                        for pay_statement in pay_statement_response.responses[0].body.pay_statements:
+                            if pay_statement.individual_id == employee_id:
+                                employee_pay_statement = pay_statement
+                                break
+                    
+                    # Convert to dict for JSON serialization
+                    payment_data = {
+                        'payment_id': payment.id,
+                        'pay_date': payment.pay_date,
+                        'pay_period': {
+                            'start_date': payment.pay_period.start_date if payment.pay_period else None,
+                            'end_date': payment.pay_period.end_date if payment.pay_period else None
+                        } if payment.pay_period else None,
+                        'pay_statement': None,
+                        'pay_statement_error': None
+                    }
+                    
+                    if employee_pay_statement:
+                        # Convert pay statement to dict
+                        pay_statement_dict = employee_pay_statement.__dict__.copy()
+                        
+                        # Handle nested objects
+                        for key, value in pay_statement_dict.items():
+                            if hasattr(value, '__dict__'):
+                                pay_statement_dict[key] = value.__dict__
+                            elif isinstance(value, list) and value and hasattr(value[0], '__dict__'):
+                                pay_statement_dict[key] = [item.__dict__ for item in value]
+                        
+                        payment_data['pay_statement'] = pay_statement_dict
+                    else:
+                        payment_data['pay_statement_error'] = 'No pay statement found for this employee'
+                    
+                    employee_payments.append(payment_data)
+                    
+                except Exception as pay_stmt_error:
+                    # Still include the payment even if pay statement fails
+                    payment_data = {
+                        'payment_id': payment.id,
+                        'pay_date': payment.pay_date,
+                        'pay_period': {
+                            'start_date': payment.pay_period.start_date if payment.pay_period else None,
+                            'end_date': payment.pay_period.end_date if payment.pay_period else None
+                        } if payment.pay_period else None,
+                        'pay_statement': None,
+                        'pay_statement_error': f'Error fetching pay statement: {str(pay_stmt_error)}'
+                    }
+                    employee_payments.append(payment_data)
+        
+        # Sort by pay date (most recent first)
+        employee_payments.sort(key=lambda x: x['pay_date'] or '', reverse=True)
+        
+        return jsonify({
+            'employee_id': employee_id,
+            'payments': employee_payments,
+            'date_range': f'{start_date} to {end_date}',
+            'total_payments': len(employee_payments)
+        })
+        
+    except APIError as e:
+        error_msg = f"API Error: {e}"
+        if hasattr(e, 'status_code') and e.status_code == 501:
+            error_msg = "Payment data unsupported for this provider"
+        return jsonify({'error': error_msg}), 400
+    except Exception as e:
+        error_msg = f"Unexpected error: {e}"
+        return jsonify({'error': error_msg}), 500
+
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)

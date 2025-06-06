@@ -39,6 +39,28 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Comprehensive Payroll Integration and Enhanced Search
+- **Full Payroll Data Access**: Added complete payroll integration with payment and pay statement endpoints
+- **Employee Payments Tab**: New Payments tab in employee drawer displays detailed payroll information including:
+  - Payment summaries with date ranges and totals
+  - Detailed pay statements with gross/net pay, hours, and payment methods
+  - Color-coded breakdowns for earnings (blue), taxes (yellow), deductions (pink), and employer contributions (green)
+  - Proper currency formatting and error handling for unsupported providers
+- **Smart Reauthentication System**: Intelligent payroll scope management with:
+  - "Add Payroll" buttons that appear only when payroll scopes are missing
+  - "✓ Payroll" indicators for connections that already have payroll permissions
+  - Seamless reauthentication flow that updates existing connections instead of creating duplicates
+  - Automatic scope detection and visual feedback
+- **Enhanced Employee Search**: Upgraded search functionality to include:
+  - Employee ID search capability for cross-referencing payment data
+  - Name and department search (existing functionality)
+  - Updated placeholder text to reflect expanded search capabilities
+- **Production-Ready Architecture**: Clean, professional implementation with:
+  - Comprehensive API endpoints for employee payment data (`/api/employee/<id>/payments`)
+  - Proper error handling and loading states throughout
+  - Removed all debug endpoints and temporary development tools
+  - Responsive design that works seamlessly on mobile and desktop
+
 ### Streamlined Home Page Navigation
 - **Removed Redundant Buttons**: Eliminated "View Company Info" and "View Org Chart" buttons from home page
 - **Simplified User Flow**: Streamlined navigation to focus on employee directory as the primary entry point
