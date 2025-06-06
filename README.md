@@ -39,6 +39,17 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Redesigned Employee Directory with Modern UI
+- Complete redesign of employee directory page with Weave-inspired modern interface
+- Added beautiful gradient avatar initials for each employee
+- Implemented real-time search functionality for filtering employees by name or department
+- Enhanced table design with improved typography, spacing, and visual hierarchy
+- Added color-coded status badges for active/inactive employees
+- Implemented hover effects, smooth transitions, and loading animations
+- Created responsive design that works seamlessly on mobile and desktop
+- Improved navigation with modern button styling and better user experience
+- Added professional enterprise-grade styling suitable for HR applications
+
 ### Added Interactive Organization Chart Feature
 - Implemented beautiful hierarchical organization chart visualization
 - Added /org-chart route with employee hierarchy based on manager relationships

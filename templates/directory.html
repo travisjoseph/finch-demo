@@ -3,60 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Directory</title>
+    <title>Employee Directory - Finch Demo</title>
     <style>
-        body { font-family: sans-serif; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .inactive { color: #aaa; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-purple {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background-color: #5a32a3;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .content-header {
+            padding: 24px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            color: #28a745;
+            border-bottom-color: #28a745;
+        }
+
+        .search-container {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #28a745;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .employee-table th {
+            background-color: #f8f9fa;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .employee-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        .employee-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .employee-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .employee-row.inactive {
+            opacity: 0.6;
+        }
+
+        /* Employee Info */
+        .employee-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .employee-details h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .employee-details p {
+            margin: 0;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Unavailable text */
         .unavailable {
-            color: red;
+            color: #6c757d;
             font-style: italic;
+            font-size: 13px;
+        }
+
+        /* Action Button */
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #6c757d;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        /* Error Message */
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 24px;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .nav-buttons {
+                justify-content: center;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-container {
+                min-width: auto;
+            }
+
+            .employee-table th,
+            .employee-table td {
+                padding: 12px 8px;
+                font-size: 13px;
+            }
+
+            .employee-info {
+                gap: 8px;
+            }
+
+            .employee-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div style="margin-bottom: 20px;">
-        <a href="/" style="display: inline-block; padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">← Back to Provider Selection</a>
-        <a href="/company" style="display: inline-block; padding: 8px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">Company Info</a>
-        <a href="/org-chart" style="display: inline-block; padding: 8px 15px; background-color: #6f42c1; color: white; text-decoration: none; border-radius: 4px;">Org Chart</a>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Employee Directory</h1>
+            <div class="nav-buttons">
+                <a href="/" class="btn btn-secondary">← Back to Provider Selection</a>
+                <a href="/company" class="btn btn-primary">Company Info</a>
+                <a href="/org-chart" class="btn btn-purple">Org Chart</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div class="tabs">
+                    <button class="tab active">Employee List</button>
+                </div>
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="Search employees..." id="searchInput">
+                </div>
+            </div>
+
+            {% if error_message %}
+                <div class="error-message">
+                    <strong>Error:</strong> {{ error_message }}
+                </div>
+            {% elif directory_data %}
+                <div class="table-container">
+                    <table class="employee-table" id="employeeTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Manager</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for employee in directory_data %}
+                            <tr class="employee-row {{ 'inactive' if not employee.is_active else '' }}" data-name="{{ (employee.first_name + ' ' + employee.last_name).lower() }}" data-department="{{ employee.department.name.lower() if employee.department else '' }}">
+                                <td>
+                                    <div class="employee-info">
+                                        <div class="employee-avatar">
+                                            {{ employee.first_name[0] if employee.first_name else '?' }}{{ employee.last_name[0] if employee.last_name else '' }}
+                                        </div>
+                                        <div class="employee-details">
+                                            <h4>{{ employee.first_name }} {% if employee.middle_name %}{{ employee.middle_name[0] }}. {% endif %}{{ employee.last_name }}</h4>
+                                            <p>ID: {{ employee.id }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if employee.department %}
+                                        <span>{{ employee.department.name }}</span>
+                                    {% else %}
+                                        <span class="unavailable">Not specified</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if employee.manager %}
+                                        <span>{{ employee.manager.id }}</span>
+                                    {% else %}
+                                        <span class="unavailable">No manager</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="status-badge {{ 'status-active' if employee.is_active else 'status-inactive' }}">
+                                        {{ 'Active' if employee.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/directory/employee/{{ employee.id }}" class="action-btn" title="View Details">
+                                        ⋯
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No employees found</h3>
+                    <p>There are no employees in the directory at this time.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
-    
-    <h1>Employee Directory</h1>
 
-    {% if error_message %}
-        <p class="unavailable" style="color: red; font-style: italic;">{{ error_message }}</p>
-    {% elif directory_data %}
-        <table id="employeeTable">
-            <thead>
-                <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Middle Name</th>
-                <th>Last Name</th>
-                <th>Department</th>
-                <th>Manager ID</th>
-                <th>Active</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for employee in directory_data %}
-            <tr class="{{ 'inactive' if not employee.is_active else '' }}">
-                <td><a href="/directory/employee/{{ employee.id }}">{{ employee.id }}</a></td>
-                <td>{{ employee.first_name }}</td>
-                <td>{% if employee.middle_name %}<span class="value">{{ employee.middle_name }}</span>{% else %}<span class="unavailable">unavailable</span>{% endif %}</td>
-                <td>{{ employee.last_name }}</td>
-                <td>{% if employee.department %}<span class="value">{{ employee.department.name }}</span>{% else %}<span class="unavailable">unavailable</span>{% endif %}</td>
-                <td>{% if employee.manager %}<span class="value">{{ employee.manager.id }}</span>{% else %}<span class="unavailable">unavailable</span>{% endif %}</td>
-                <td>{{ 'Yes' if employee.is_active else 'No' }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="unavailable">No directory data found.</p>
-    {% endif %}
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.employee-row');
+            
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                const department = row.getAttribute('data-department');
+                const isVisible = name.includes(searchTerm) || department.includes(searchTerm);
+                row.style.display = isVisible ? '' : 'none';
+            });
+        });
 
+        // Add loading state for action buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.innerHTML = '<span class="loading"></span>';
+            });
+        });
+    </script>
 </body>
 </html>
