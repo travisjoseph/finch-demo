@@ -35,4 +35,14 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 - If a provider does not support a specific field (`null`or `None`), it will display as *unavailable*.
 - If a provider does not support an endpoint, a custom *unsupported for provider* error is displayed.
 - Connect scopes are limited to the endpoints required for this demo.
-- This app stores tokens in a `.csv` locally. **This is not inteded for production use**. If the `tokens.csv` file does not exist, the app will create one. If multiple providers are connected, the applicaiton will fetch data from the most recent connected provider by default. 
+- This app stores tokens in a `.csv` locally. **This is not inteded for production use**. If the `tokens.csv` file does not exist, the app will create one. If multiple providers are connected, the applicaiton will fetch data from the most recent connected provider by default.
+
+## Changelog
+
+### Enhanced Provider Navigation and Multi-Connection Management
+- Added comprehensive navigation system across all pages
+- Implemented provider selection and switching functionality  
+- Enhanced home page with direct access to company data and directory
+- Added consistent navigation bars with "Back to Provider Selection" options
+- Improved user experience for managing multiple provider connections
+- Updated CSV structure to track active provider connections

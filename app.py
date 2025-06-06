@@ -16,18 +16,103 @@ REDIRECT_URI = os.getenv("REDIRECT_URI")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_FILE_PATH = os.path.join(BASE_DIR, 'tokens.csv')
 
-def get_latest_access_token():
+def get_all_connections():
+    """Get all connections from CSV file"""
+    if not os.path.exists(CSV_FILE_PATH):
+        return []
+    
+    connections = []
     with open(CSV_FILE_PATH, mode='r', newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        all_rows = list(reader)
-        if len(all_rows) < 2: 
-            return "Error: No token data found in file.", 500
-        return all_rows[-1][0]
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            connections.append(row)
+    return connections
+
+def get_active_connection():
+    """Get the currently active connection"""
+    connections = get_all_connections()
+    if not connections:
+        return None
+    
+    # Look for active connection first
+    for conn in connections:
+        if conn.get('active') == 'True':
+            return conn
+    
+    # If no active connection set, return the most recent one
+    return connections[-1]
+
+def get_latest_access_token():
+    """Get access token for active connection"""
+    active_conn = get_active_connection()
+    if not active_conn:
+        return "Error: No token data found in file.", 500
+    return active_conn['access_token']
+
+def set_active_connection(connection_id):
+    """Set a connection as active"""
+    connections = get_all_connections()
+    if not connections:
+        return False
+    
+    # Update active status
+    for conn in connections:
+        conn['active'] = 'True' if conn['connection_id'] == connection_id else 'False'
+    
+    # Write back to CSV
+    header = ['access_token', 'token_type', 'connection_id', 'customer_id',
+              'account_id', 'client_type', 'company_id', 'connection_type',
+              'products', 'provider_id', 'active']
+    
+    with open(CSV_FILE_PATH, mode='w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=header)
+        writer.writeheader()
+        writer.writerows(connections)
+    
+    return True
+
+def get_connection_details(access_token):
+    """Get provider and company details for a connection"""
+    try:
+        client = Finch(access_token=access_token)
+        company_data = client.hris.company.retrieve()
+        return {
+            'company_name': company_data.legal_name or 'Unknown Company',
+            'status': 'Active'
+        }
+    except Exception as e:
+        return {
+            'company_name': 'Unknown Company',
+            'status': 'Error'
+        }
 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    connections = get_all_connections()
+    active_conn = get_active_connection()
+    
+    # Get details for each connection
+    connection_details = []
+    for conn in connections:
+        details = get_connection_details(conn['access_token'])
+        connection_details.append({
+            'connection_id': conn['connection_id'],
+            'provider_id': conn['provider_id'],
+            'company_name': details['company_name'],
+            'status': details['status'],
+            'is_active': conn.get('active') == 'True' or (active_conn and conn['connection_id'] == active_conn['connection_id'])
+        })
+    
+    return render_template('index.html', connections=connection_details)
+
+@app.route('/select_provider/<connection_id>')
+def select_provider(connection_id):
+    success = set_active_connection(connection_id)
+    if success:
+        return redirect('/company')
+    else:
+        return redirect('/')
 
 
 @app.route('/connect')
@@ -64,9 +149,23 @@ def authorize():
     # Storing locally in a csv for demo purposes
     header = ['access_token', 'token_type', 'connection_id', 'customer_id',
               'account_id', 'client_type', 'company_id', 'connection_type',
-              'products', 'provider_id']
+              'products', 'provider_id', 'active']
 
     products_str = "|".join(create_access_token_response.products)
+
+    # Set new connection as active, deactivate others
+    file_exists = os.path.exists(CSV_FILE_PATH)
+    if file_exists:
+        # Deactivate existing connections
+        connections = get_all_connections()
+        for conn in connections:
+            conn['active'] = 'False'
+        
+        # Write back existing connections
+        with open(CSV_FILE_PATH, mode='w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=header)
+            writer.writeheader()
+            writer.writerows(connections)
 
     row_data = [
         create_access_token_response.access_token,
@@ -78,10 +177,9 @@ def authorize():
         create_access_token_response.company_id,
         create_access_token_response.connection_type,
         products_str,
-        create_access_token_response.provider_id
+        create_access_token_response.provider_id,
+        'True'  # New connection is active
     ]
-
-    file_exists = os.path.exists(CSV_FILE_PATH)
     
     with open(CSV_FILE_PATH, mode='a', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)

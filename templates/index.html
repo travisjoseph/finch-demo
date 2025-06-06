@@ -3,25 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Your Account</title>
+    <title>Provider Connections</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
-        .connect-button {
+        body { 
+            font-family: sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .connections-section {
+            margin-bottom: 30px;
+        }
+        .connections-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .connections-table th,
+        .connections-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .connections-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        .status-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .status-error {
+            color: #dc3545;
+        }
+        .active-indicator {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .select-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .select-button:hover {
+            background-color: #0056b3;
+        }
+        .select-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .connect-new-button {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 16px;
             color: white;
-            background-color: #007bff;
+            background-color: #28a745;
             border: none;
             border-radius: 5px;
             text-decoration: none;
             cursor: pointer;
+            margin-top: 20px;
+        }
+        .connect-new-button:hover {
+            background-color: #218838;
+        }
+        .no-connections {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 40px 0;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome!</h1>
-    <p>Please connect your account to continue.</p>
-    <a href="/connect" class="connect-button">Connect Account</a>
+    <div class="container">
+        <h1>Provider Connections</h1>
+        
+        {% if connections %}
+        <div class="connections-section">
+            <div class="section-title">Connected Providers</div>
+            <table class="connections-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Company</th>
+                        <th>Status</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conn in connections %}
+                    <tr>
+                        <td>{{ conn.provider_id }}</td>
+                        <td>{{ conn.company_name }}</td>
+                        <td class="{% if conn.status == 'Active' %}status-active{% else %}status-error{% endif %}">
+                            {{ conn.status }}
+                        </td>
+                        <td>
+                            {% if conn.is_active %}
+                                <span class="active-indicator">ACTIVE</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not conn.is_active %}
+                                <a href="/select_provider/{{ conn.connection_id }}" class="select-button">Select</a>
+                            {% else %}
+                                <button class="select-button" disabled>Current</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-connections">
+            <p>No providers connected yet. Connect your first provider to get started!</p>
+        </div>
+        {% endif %}
+        
+        <div style="text-align: center;">
+            <a href="/connect" class="connect-new-button">Connect New Provider</a>
+        </div>
+        
+        {% if connections %}
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Select a provider above to switch active connection, or use the buttons below to view data for the current active provider.
+            </p>
+            <div style="margin-top: 15px;">
+                <a href="/company" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">View Company Info</a>
+                <a href="/directory" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">View Employee Directory</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
