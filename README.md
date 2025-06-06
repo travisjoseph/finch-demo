@@ -39,6 +39,12 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Streamlined Home Page Navigation
+- **Removed Redundant Buttons**: Eliminated "View Company Info" and "View Org Chart" buttons from home page
+- **Simplified User Flow**: Streamlined navigation to focus on employee directory as the primary entry point
+- **Cleaner Interface**: Updated home page messaging and button styling for better user experience
+- **Consistent Architecture**: Aligned home page with modern application structure where company info is integrated into directory
+
 ### Modern Employee Details Drawer Implementation
 - **Revolutionary UX Upgrade**: Replaced traditional page navigation with a beautiful slide-out drawer
 - **Click-to-View**: Entire employee table rows are now clickable to open employee details
