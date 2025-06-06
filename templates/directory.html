@@ -265,21 +265,6 @@
             font-size: 13px;
         }
 
-        /* Action Button */
-        .action-btn {
-            background: none;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: #6c757d;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-        }
 
         /* Error Message */
         .error-message {
@@ -520,6 +505,349 @@
                 justify-content: center;
             }
         }
+
+        /* Employee Drawer Styles */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(4px);
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .employee-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 520px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            overflow-y: auto;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .employee-drawer.active {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 0;
+            border-bottom: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-radius: 16px 0 0 0;
+        }
+
+        .drawer-header-content {
+            padding: 32px 24px 24px;
+            position: relative;
+        }
+
+        .drawer-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .drawer-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .employee-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: white;
+        }
+
+        .employee-profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .employee-profile-info h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: white;
+        }
+
+        .employee-profile-info .employee-id {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        .employee-status-badges {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .status-badge-modern {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-badge-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #10b981;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .status-badge-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .drawer-content {
+            padding: 0;
+            background: #f8fafc;
+        }
+
+        .drawer-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 24px;
+            position: sticky;
+            top: 140px;
+            z-index: 5;
+        }
+
+        .drawer-tab {
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .drawer-tab.active {
+            color: #f97316;
+            border-bottom-color: #f97316;
+        }
+
+        .drawer-tab:hover:not(.active) {
+            color: #475569;
+            background: #f8fafc;
+        }
+
+        .drawer-tab-content {
+            padding: 24px;
+        }
+
+        .info-cards {
+            display: grid;
+            gap: 16px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .info-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+        }
+
+        .info-card-icon.personal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .info-card-icon.contact {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .info-card-icon.employment {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .info-card-icon.location {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .info-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .info-value.unavailable {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .drawer-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            flex-direction: column;
+            gap: 20px;
+            background: #f8fafc;
+        }
+
+        .drawer-loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #f97316;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .drawer-loading-text {
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .drawer-error {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            margin: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .drawer-error-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #dc2626;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Make table rows clickable */
+        .employee-row {
+            cursor: pointer;
+        }
+
+        .employee-row:hover {
+            background-color: #f8f9fa !important;
+        }
+
+        /* Responsive drawer */
+        @media (max-width: 768px) {
+            .employee-drawer {
+                width: 100%;
+                right: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -530,7 +858,6 @@
             <div class="nav-buttons">
                 <a href="/" class="btn btn-secondary">← Back to Provider Selection</a>
                 <a href="/company" class="btn btn-primary">Company Info</a>
-                <a href="/org-chart" class="btn btn-purple">Org Chart</a>
             </div>
         </div>
 
@@ -653,12 +980,11 @@
                                 <th>Department</th>
                                 <th>Manager</th>
                                 <th>Status</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for employee in directory_data %}
-                            <tr class="employee-row {{ 'inactive' if not employee.is_active else '' }}" data-name="{{ (employee.first_name + ' ' + employee.last_name).lower() }}" data-department="{{ employee.department.name.lower() if employee.department else '' }}">
+                            <tr class="employee-row {{ 'inactive' if not employee.is_active else '' }}" data-name="{{ (employee.first_name + ' ' + employee.last_name).lower() }}" data-department="{{ employee.department.name.lower() if employee.department else '' }}" data-employee-id="{{ employee.id }}" onclick="openEmployeeDrawer('{{ employee.id }}')">
                                 <td>
                                     <div class="employee-info">
                                         <div class="employee-avatar">
@@ -689,11 +1015,6 @@
                                         {{ 'Active' if employee.is_active else 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>
-                                    <a href="/directory/employee/{{ employee.id }}" class="action-btn" title="View Details">
-                                        ⋯
-                                    </a>
-                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -708,7 +1029,40 @@
         </div>
     </div>
 
+    <!-- Employee Details Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeEmployeeDrawer()"></div>
+    <div class="employee-drawer" id="employeeDrawer">
+        <div class="drawer-header">
+            <div class="drawer-header-content">
+                <button class="drawer-close" onclick="closeEmployeeDrawer()" aria-label="Close drawer">×</button>
+                <div class="employee-profile" id="employeeProfile">
+                    <div class="employee-profile-avatar" id="profileAvatar">?</div>
+                    <div class="employee-profile-info">
+                        <h2 id="profileName">Employee Details</h2>
+                        <p class="employee-id" id="profileId">Loading...</p>
+                    </div>
+                </div>
+                <div class="employee-status-badges" id="statusBadges">
+                    <!-- Status badges will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        <div class="drawer-tabs" id="drawerTabs">
+            <button class="drawer-tab active" data-tab="overview">Overview</button>
+            <button class="drawer-tab" data-tab="employment">Employment</button>
+        </div>
+        <div class="drawer-content" id="drawerContent">
+            <div class="drawer-loading">
+                <div class="drawer-loading-spinner"></div>
+                <p class="drawer-loading-text">Loading employee details...</p>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let currentEmployeeData = null;
+        let activeTab = 'overview';
+
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
@@ -722,11 +1076,389 @@
             });
         });
 
-        // Add loading state for action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.innerHTML = '<span class="loading"></span>';
+        // Tab functionality
+        function initializeTabs() {
+            const tabs = document.querySelectorAll('.drawer-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
             });
+        }
+
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.drawer-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            activeTab = tabName;
+            
+            // Re-render content for the active tab
+            if (currentEmployeeData) {
+                renderTabContent(currentEmployeeData, tabName);
+            }
+        }
+
+        // Employee drawer functionality
+        function openEmployeeDrawer(employeeId) {
+            const overlay = document.getElementById('drawerOverlay');
+            const drawer = document.getElementById('employeeDrawer');
+            const content = document.getElementById('drawerContent');
+            
+            // Reset to overview tab
+            activeTab = 'overview';
+            document.querySelectorAll('.drawer-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('[data-tab="overview"]').classList.add('active');
+            
+            // Show loading state
+            content.innerHTML = `
+                <div class="drawer-loading">
+                    <div class="drawer-loading-spinner"></div>
+                    <p class="drawer-loading-text">Loading employee details...</p>
+                </div>
+            `;
+            
+            // Reset profile header
+            document.getElementById('profileAvatar').textContent = '?';
+            document.getElementById('profileName').textContent = 'Employee Details';
+            document.getElementById('profileId').textContent = 'Loading...';
+            document.getElementById('statusBadges').innerHTML = '';
+            
+            // Show drawer
+            overlay.classList.add('active');
+            drawer.classList.add('active');
+            
+            // Initialize tabs
+            initializeTabs();
+            
+            // Fetch employee data
+            fetch(`/api/employee/${employeeId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch employee data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    currentEmployeeData = data;
+                    updateProfileHeader(data);
+                    renderTabContent(data, activeTab);
+                })
+                .catch(error => {
+                    console.error('Error fetching employee data:', error);
+                    content.innerHTML = `
+                        <div class="drawer-error">
+                            <div class="drawer-error-icon">!</div>
+                            <div>
+                                <strong>Error:</strong> Failed to load employee details. Please try again.
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        function closeEmployeeDrawer() {
+            const overlay = document.getElementById('drawerOverlay');
+            const drawer = document.getElementById('employeeDrawer');
+            
+            overlay.classList.remove('active');
+            drawer.classList.remove('active');
+            currentEmployeeData = null;
+        }
+
+        function updateProfileHeader(data) {
+            const profileAvatar = document.getElementById('profileAvatar');
+            const profileName = document.getElementById('profileName');
+            const profileId = document.getElementById('profileId');
+            const statusBadges = document.getElementById('statusBadges');
+            
+            if (data.individual && !data.individual_error) {
+                const individual = data.individual;
+                const firstName = individual.first_name || '';
+                const lastName = individual.last_name || '';
+                const fullName = `${firstName} ${lastName}`.trim();
+                
+                // Update avatar
+                const initials = `${firstName.charAt(0) || '?'}${lastName.charAt(0) || ''}`;
+                profileAvatar.textContent = initials;
+                
+                // Update name and ID
+                profileName.textContent = fullName || 'Employee Details';
+                profileId.textContent = `ID: ${individual.id || 'Unknown'}`;
+                
+                // Update status badges
+                let badgesHtml = '';
+                
+                // Employment status badge
+                if (data.employment && !data.employment_error) {
+                    const isActive = data.employment.is_active;
+                    if (isActive !== null && isActive !== undefined) {
+                        const statusClass = isActive ? 'status-badge-active' : 'status-badge-inactive';
+                        const statusText = isActive ? 'Active' : 'Inactive';
+                        badgesHtml += `<span class="status-badge-modern ${statusClass}">${statusText}</span>`;
+                    }
+                }
+                
+                // Department badge
+                if (data.employment && data.employment.department && data.employment.department.name) {
+                    badgesHtml += `<span class="status-badge-modern" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3);">${data.employment.department.name}</span>`;
+                }
+                
+                statusBadges.innerHTML = badgesHtml;
+            }
+        }
+
+        function renderTabContent(data, tabName) {
+            const content = document.getElementById('drawerContent');
+            
+            if (tabName === 'overview') {
+                content.innerHTML = `
+                    <div class="drawer-tab-content">
+                        ${renderOverviewTab(data)}
+                    </div>
+                `;
+            } else if (tabName === 'employment') {
+                content.innerHTML = `
+                    <div class="drawer-tab-content">
+                        ${renderEmploymentTab(data)}
+                    </div>
+                `;
+            }
+        }
+
+        function renderOverviewTab(data) {
+            let html = '<div class="info-cards">';
+            
+            // Personal Information Card
+            html += `
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon personal">👤</div>
+                        <h3 class="info-card-title">Personal Information</h3>
+                    </div>
+                    <div class="info-grid">
+            `;
+            
+            if (data.individual_error) {
+                html += `<div class="drawer-error">
+                    <div class="drawer-error-icon">!</div>
+                    <div>${data.individual_error}</div>
+                </div>`;
+            } else if (data.individual) {
+                const individual = data.individual;
+                html += createInfoItem('First Name', individual.first_name);
+                html += createInfoItem('Last Name', individual.last_name);
+                html += createInfoItem('Preferred Name', individual.preferred_name);
+                html += createInfoItem('Gender', individual.gender);
+                html += createInfoItem('Date of Birth', individual.dob);
+                html += createInfoItem('Ethnicity', individual.ethnicity);
+            } else {
+                html += '<p class="info-value unavailable">Personal information not available.</p>';
+            }
+            
+            html += '</div></div>';
+            
+            // Contact Information Card
+            html += `
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon contact">📧</div>
+                        <h3 class="info-card-title">Contact Information</h3>
+                    </div>
+                    <div class="info-grid">
+            `;
+            
+            if (data.individual && !data.individual_error) {
+                const individual = data.individual;
+                
+                // Email
+                const email = individual.emails && individual.emails[0] && individual.emails[0].data 
+                    ? individual.emails[0].data : null;
+                html += createInfoItem('Email', email);
+                
+                // Phone
+                const phone = individual.phone_numbers && individual.phone_numbers[0] && individual.phone_numbers[0].data 
+                    ? individual.phone_numbers[0].data : null;
+                html += createInfoItem('Phone', phone);
+            }
+            
+            html += '</div></div>';
+            
+            // Address Information Card
+            if (data.individual && data.individual.residence) {
+                html += `
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-card-icon location">📍</div>
+                            <h3 class="info-card-title">Address</h3>
+                        </div>
+                        <div class="info-grid">
+                `;
+                
+                const residence = data.individual.residence;
+                html += createInfoItem('Street Address', residence.line1);
+                if (residence.line2) {
+                    html += createInfoItem('Address Line 2', residence.line2);
+                }
+                html += createInfoItem('City', residence.city);
+                html += createInfoItem('State', residence.state);
+                html += createInfoItem('Postal Code', residence.postal_code);
+                html += createInfoItem('Country', residence.country);
+                
+                html += '</div></div>';
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function renderEmploymentTab(data) {
+            let html = '<div class="info-cards">';
+            
+            // Employment Details Card
+            html += `
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon employment">💼</div>
+                        <h3 class="info-card-title">Employment Details</h3>
+                    </div>
+                    <div class="info-grid">
+            `;
+            
+            if (data.employment_error) {
+                html += `<div class="drawer-error">
+                    <div class="drawer-error-icon">!</div>
+                    <div>${data.employment_error}</div>
+                </div>`;
+            } else if (data.employment) {
+                const employment = data.employment;
+                
+                html += createInfoItem('Job Title', employment.title);
+                html += createInfoItem('Department', employment.department && employment.department.name ? employment.department.name : null);
+                html += createInfoItem('Start Date', employment.start_date);
+                html += createInfoItem('End Date', employment.end_date);
+                
+                const empType = employment.employment && employment.employment.type ? employment.employment.type : null;
+                const empSubtype = employment.employment && employment.employment.subtype ? employment.employment.subtype : null;
+                html += createInfoItem('Employment Type', empType);
+                html += createInfoItem('Employment Subtype', empSubtype);
+                
+                const isActive = employment.is_active !== null && employment.is_active !== undefined 
+                    ? (employment.is_active ? 'Yes' : 'No') : null;
+                html += createInfoItem('Active Status', isActive);
+                
+                const manager = employment.manager && employment.manager.id ? employment.manager.id : null;
+                html += createInfoItem('Manager ID', manager);
+            } else {
+                html += '<p class="info-value unavailable">Employment information not available.</p>';
+            }
+            
+            html += '</div></div>';
+            
+            // Work Location Card
+            if (data.employment && data.employment.location) {
+                html += `
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-card-icon location">🏢</div>
+                            <h3 class="info-card-title">Work Location</h3>
+                        </div>
+                        <div class="info-grid">
+                `;
+                
+                const location = data.employment.location;
+                html += createInfoItem('Address', location.line1);
+                if (location.line2) {
+                    html += createInfoItem('Address Line 2', location.line2);
+                }
+                html += createInfoItem('City', location.city);
+                html += createInfoItem('State', location.state);
+                html += createInfoItem('Postal Code', location.postal_code);
+                html += createInfoItem('Country', location.country);
+                
+                html += '</div></div>';
+            }
+            
+            // Compensation Card
+            if (data.employment && (data.employment.income || (data.employment.income_history && data.employment.income_history.length > 0))) {
+                html += `
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-card-icon employment">💰</div>
+                            <h3 class="info-card-title">Compensation</h3>
+                        </div>
+                        <div class="info-grid">
+                `;
+                
+                // Current income
+                if (data.employment.income) {
+                    const income = data.employment.income;
+                    const amount = income.amount !== null && income.amount !== undefined ? income.amount : null;
+                    const currency = income.currency || '';
+                    const unit = income.unit || 'unit';
+                    
+                    const incomeText = amount !== null ? `${amount} ${currency} per ${unit}` : null;
+                    html += createInfoItem('Current Income', incomeText);
+                }
+                
+                html += '</div>';
+                
+                // Income history
+                if (data.employment.income_history && data.employment.income_history.length > 0) {
+                    html += '<div style="margin-top: 16px;">';
+                    html += '<div class="info-label">Income History</div>';
+                    html += '<div style="margin-top: 8px;">';
+                    
+                    data.employment.income_history.forEach(record => {
+                        const amount = record.amount !== null && record.amount !== undefined ? record.amount : 'N/A';
+                        const currency = record.currency || '';
+                        const unit = record.unit || 'unit';
+                        const effectiveDate = record.effective_date || 'N/A';
+                        
+                        html += `
+                            <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #f97316;">
+                                <div style="font-weight: 500; color: #1e293b;">${amount} ${currency} per ${unit}</div>
+                                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Effective: ${effectiveDate}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div></div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function createInfoItem(label, value) {
+            const displayValue = value !== null && value !== undefined && value !== '' 
+                ? value 
+                : '<span class="unavailable">unavailable</span>';
+            
+            return `
+                <div class="info-item">
+                    <div class="info-label">${label}</div>
+                    <div class="info-value">${displayValue}</div>
+                </div>
+            `;
+        }
+
+        // Close drawer on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEmployeeDrawer();
+            }
+        });
+
+        // Prevent drawer from closing when clicking inside the drawer
+        document.getElementById('employeeDrawer').addEventListener('click', function(e) {
+            e.stopPropagation();
         });
 
     </script>

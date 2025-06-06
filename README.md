@@ -39,6 +39,23 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Modern Employee Details Drawer Implementation
+- **Revolutionary UX Upgrade**: Replaced traditional page navigation with a beautiful slide-out drawer
+- **Click-to-View**: Entire employee table rows are now clickable to open employee details
+- **Modern Design**: Gradient header with employee profile, status badges, and professional styling
+- **Tabbed Interface**: Organized information into Overview and Employment tabs for better navigation
+- **Card-Based Layout**: Information displayed in clean, modern cards with icons and proper hierarchy
+- **API Integration**: New `/api/employee/<id>` endpoint provides JSON data for seamless drawer functionality
+- **Responsive Design**: Drawer adapts to mobile (full-screen) and desktop (520px width) perfectly
+- **Enhanced Animations**: Smooth slide-in transitions and hover effects throughout
+- **Removed Redundancy**: Eliminated action column and separate employee detail page for cleaner interface
+
+### Streamlined Application Architecture
+- **Removed Organization Chart**: Eliminated org chart functionality to focus on core employee directory features
+- **Cleaner Navigation**: Simplified navigation with fewer buttons and clearer user flow
+- **Code Optimization**: Removed unused routes, templates, and helper functions for better maintainability
+- **Focused User Experience**: Streamlined application provides better performance and usability
+
 ### Redesigned Employee Directory with Modern UI
 - Complete redesign of employee directory page with Weave-inspired modern interface
 - Added beautiful gradient avatar initials for each employee
@@ -49,16 +66,6 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 - Created responsive design that works seamlessly on mobile and desktop
 - Improved navigation with modern button styling and better user experience
 - Added professional enterprise-grade styling suitable for HR applications
-
-### Added Interactive Organization Chart Feature
-- Implemented beautiful hierarchical organization chart visualization
-- Added /org-chart route with employee hierarchy based on manager relationships
-- Created interactive employee cards with gradient styling and hover effects
-- Integrated job titles from employment API data
-- Added department color coding and legend
-- Implemented click-to-navigate functionality from org chart to employee details
-- Added org chart navigation links across all pages
-- Built responsive design that works on mobile and desktop
 
 ### Enhanced Provider Navigation and Multi-Connection Management
 - Added comprehensive navigation system across all pages
