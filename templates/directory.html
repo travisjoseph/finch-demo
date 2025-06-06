@@ -848,6 +848,63 @@
                 right: 0;
             }
         }
+
+        /* Copy to clipboard styles */
+        .copy-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            margin-left: 8px;
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0, 123, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #007bff;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+        }
+
+        .copy-button:hover {
+            opacity: 1;
+            background: rgba(0, 123, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .copy-button.copied {
+            background: rgba(40, 167, 69, 0.2);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+
+        .copy-id-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .copy-feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -857,7 +914,6 @@
             <h1>Employee Directory</h1>
             <div class="nav-buttons">
                 <a href="/" class="btn btn-secondary">← Back to Provider Selection</a>
-                <a href="/company" class="btn btn-primary">Company Info</a>
             </div>
         </div>
 
@@ -992,7 +1048,7 @@
                                         </div>
                                         <div class="employee-details">
                                             <h4>{{ employee.first_name }} {% if employee.middle_name %}{{ employee.middle_name[0] }}. {% endif %}{{ employee.last_name }}</h4>
-                                            <p>ID: {{ employee.id }}</p>
+                                            <p class="copy-id-container">ID: {{ employee.id }}<button class="copy-button" onclick="event.stopPropagation(); copyToClipboard('{{ employee.id }}', this)" title="Copy Employee ID" aria-label="Copy Employee ID">📋</button></p>
                                         </div>
                                     </div>
                                 </td>
@@ -1000,14 +1056,14 @@
                                     {% if employee.department %}
                                         <span>{{ employee.department.name }}</span>
                                     {% else %}
-                                        <span class="unavailable">Not specified</span>
+                                        <span class="unavailable">-</span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     {% if employee.manager %}
                                         <span>{{ employee.manager.id }}</span>
                                     {% else %}
-                                        <span class="unavailable">No manager</span>
+                                        <span class="unavailable">-</span>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -1189,7 +1245,8 @@
                 
                 // Update name and ID
                 profileName.textContent = fullName || 'Employee Details';
-                profileId.textContent = `ID: ${individual.id || 'Unknown'}`;
+                const employeeId = individual.id || 'Unknown';
+                profileId.innerHTML = `<span class="copy-id-container">ID: ${employeeId}${createCopyButton(employeeId, 'Copy Employee ID')}</span>`;
                 
                 // Update status badges
                 let badgesHtml = '';
@@ -1486,9 +1543,23 @@
         }
 
         function createInfoItem(label, value) {
-            const displayValue = value !== null && value !== undefined && value !== '' 
-                ? value 
-                : '<span class="unavailable">unavailable</span>';
+            let displayValue;
+            
+            if (value !== null && value !== undefined && value !== '') {
+                // Check if this is a date field and format accordingly
+                if (label.toLowerCase().includes('date') || label === 'Date of Birth') {
+                    displayValue = formatDate(value);
+                } else {
+                    displayValue = value;
+                }
+                
+                // Add copy button for ID fields
+                if (label.toLowerCase().includes('id') && !displayValue.includes('unavailable')) {
+                    displayValue = `<span class="copy-id-container">${displayValue}${createCopyButton(value, `Copy ${label}`)}</span>`;
+                }
+            } else {
+                displayValue = '<span class="unavailable">-</span>';
+            }
             
             return `
                 <div class="info-item">
@@ -1513,6 +1584,19 @@
             let html = '<div class="info-cards">';
 
             // Payment Summary Card
+            let formattedDateRange = 'N/A';
+            if (paymentData.date_range) {
+                // Parse the date range "YYYY-MM-DD to YYYY-MM-DD"
+                const dateRangeParts = paymentData.date_range.split(' to ');
+                if (dateRangeParts.length === 2) {
+                    const startDate = formatDate(dateRangeParts[0]);
+                    const endDate = formatDate(dateRangeParts[1]);
+                    formattedDateRange = `${startDate} to ${endDate}`;
+                } else {
+                    formattedDateRange = paymentData.date_range;
+                }
+            }
+
             html += `
                 <div class="info-card">
                     <div class="info-card-header">
@@ -1526,7 +1610,7 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">Date Range</div>
-                            <div class="info-value">${paymentData.date_range || 'N/A'}</div>
+                            <div class="info-value">${formattedDateRange}</div>
                         </div>
                     </div>
                 </div>
@@ -1539,7 +1623,7 @@
                         <div class="info-card">
                             <div class="info-card-header">
                                 <div class="info-card-icon personal">📄</div>
-                                <h3 class="info-card-title">Payment ${index + 1} - ${payment.pay_date || 'Date N/A'}</h3>
+                                <h3 class="info-card-title">${formatDate(payment.pay_date) || 'Date N/A'}</h3>
                             </div>
                     `;
 
@@ -1549,15 +1633,15 @@
                             <div class="info-grid" style="margin-bottom: 16px;">
                                 <div class="info-item">
                                     <div class="info-label">Pay Period Start</div>
-                                    <div class="info-value">${payment.pay_period.start_date || 'N/A'}</div>
+                                    <div class="info-value">${formatDate(payment.pay_period.start_date) || 'N/A'}</div>
                                 </div>
                                 <div class="info-item">
                                     <div class="info-label">Pay Period End</div>
-                                    <div class="info-value">${payment.pay_period.end_date || 'N/A'}</div>
+                                    <div class="info-value">${formatDate(payment.pay_period.end_date) || 'N/A'}</div>
                                 </div>
                                 <div class="info-item">
                                     <div class="info-label">Payment ID</div>
-                                    <div class="info-value" style="font-family: monospace; font-size: 12px;">${payment.payment_id}</div>
+                                    <div class="info-value" style="font-family: monospace; font-size: 12px;"><span class="copy-id-container">${payment.payment_id}${createCopyButton(payment.payment_id, 'Copy Payment ID')}</span></div>
                                 </div>
                             </div>
                         `;
@@ -1734,6 +1818,127 @@
                 style: 'currency',
                 currency: currency.toUpperCase()
             }).format(dollars);
+        }
+
+
+        // Date formatting function
+        function formatDate(dateString) {
+            if (!dateString || dateString === 'N/A' || dateString === null || dateString === undefined) {
+                return 'N/A';
+            }
+            
+            try {
+                const date = new Date(dateString);
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    return dateString; // Return original if invalid
+                }
+                
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                return dateString; // Return original if error
+            }
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(text, button) {
+            if (!text || text === 'N/A' || text === 'Unknown') {
+                return;
+            }
+
+            // Use modern Clipboard API if available
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyFeedback(button);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    fallbackCopyTextToClipboard(text, button);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyTextToClipboard(text, button);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text, button) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyFeedback(button);
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        function showCopyFeedback(button) {
+            // Update button appearance
+            const originalContent = button.innerHTML;
+            button.innerHTML = '✓';
+            button.classList.add('copied');
+
+            // Show global feedback
+            showGlobalCopyFeedback();
+
+            // Reset button after delay
+            setTimeout(() => {
+                button.innerHTML = originalContent;
+                button.classList.remove('copied');
+            }, 1500);
+        }
+
+        function showGlobalCopyFeedback() {
+            // Remove existing feedback if any
+            const existingFeedback = document.querySelector('.copy-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            // Create and show new feedback
+            const feedback = document.createElement('div');
+            feedback.className = 'copy-feedback';
+            feedback.textContent = 'ID copied to clipboard!';
+            document.body.appendChild(feedback);
+
+            // Trigger animation
+            setTimeout(() => {
+                feedback.classList.add('show');
+            }, 10);
+
+            // Remove after delay
+            setTimeout(() => {
+                feedback.classList.remove('show');
+                setTimeout(() => {
+                    if (feedback.parentNode) {
+                        feedback.parentNode.removeChild(feedback);
+                    }
+                }, 300);
+            }, 2000);
+        }
+
+        function createCopyButton(text, label = 'Copy ID') {
+            if (!text || text === 'N/A' || text === 'Unknown' || text.includes('unavailable')) {
+                return '';
+            }
+
+            return `<button class="copy-button" onclick="copyToClipboard('${text}', this)" title="${label}" aria-label="${label}">📋</button>`;
         }
 
         // Close drawer on Escape key

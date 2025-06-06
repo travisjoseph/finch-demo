@@ -118,7 +118,7 @@ def home():
 def select_provider(connection_id):
     success = set_active_connection(connection_id)
     if success:
-        return redirect('/company')
+        return redirect('/directory')
     else:
         return redirect('/')
 
@@ -280,8 +280,8 @@ def authorize():
                 writer.writerow(header)
             writer.writerow(row_data)
 
-    # Redirect to company route
-    return redirect('/company')
+    # Redirect to directory route
+    return redirect('/directory')
 
 @app.route('/company')
 def company():
