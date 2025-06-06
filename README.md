@@ -39,6 +39,16 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Added Interactive Organization Chart Feature
+- Implemented beautiful hierarchical organization chart visualization
+- Added /org-chart route with employee hierarchy based on manager relationships
+- Created interactive employee cards with gradient styling and hover effects
+- Integrated job titles from employment API data
+- Added department color coding and legend
+- Implemented click-to-navigate functionality from org chart to employee details
+- Added org chart navigation links across all pages
+- Built responsive design that works on mobile and desktop
+
 ### Enhanced Provider Navigation and Multi-Connection Management
 - Added comprehensive navigation system across all pages
 - Implemented provider selection and switching functionality  

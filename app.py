@@ -86,6 +86,53 @@ def get_connection_details(access_token):
             'status': 'Error'
         }
 
+def build_org_chart_data(individuals):
+    """Build hierarchical org chart data from employee list"""
+    # Create employee lookup dictionary
+    employees = {}
+    for emp in individuals:
+        employees[emp.id] = {
+            'id': emp.id,
+            'first_name': emp.first_name,
+            'last_name': emp.last_name,
+            'title': None,  # Will be filled from employment data
+            'department': emp.department.name if emp.department else 'Unknown',
+            'manager_id': emp.manager.id if emp.manager else None,
+            'is_active': emp.is_active,
+            'children': []
+        }
+    
+    # Build hierarchy by connecting children to managers
+    root_employees = []
+    for emp_id, emp_data in employees.items():
+        manager_id = emp_data['manager_id']
+        if manager_id and manager_id in employees:
+            # Add this employee as a child of their manager
+            employees[manager_id]['children'].append(emp_data)
+        else:
+            # This is a top-level employee (no manager or manager not in dataset)
+            root_employees.append(emp_data)
+    
+    return root_employees
+
+def get_employee_employment_data(employee_ids, access_token):
+    """Get employment data for multiple employees to get job titles"""
+    client = Finch(access_token=access_token)
+    employment_data = {}
+    
+    try:
+        # Batch request for employment data
+        requests = [{"individual_id": emp_id} for emp_id in employee_ids]
+        page = client.hris.employments.retrieve_many(requests=requests)
+        
+        for response in page.responses:
+            if response.body and response.body.title:
+                employment_data[response.individual_id] = response.body.title
+    except Exception as e:
+        print(f"Error fetching employment data: {e}")
+    
+    return employment_data
+
 
 @app.route('/')
 def home():
@@ -240,6 +287,49 @@ def directory():
 
     return render_template('directory.html', directory_data=individuals, error_message=error_message)
 
+@app.route('/org-chart')
+def org_chart():
+    client = Finch(
+        access_token=get_latest_access_token(),
+    )
+
+    # Get directory data and build org chart
+    individuals = []
+    error_message = None
+    org_chart_data = []
+    
+    try:
+        individuals = client.hris.directory.list().individuals
+        
+        if individuals:
+            # Get employment data for job titles
+            employee_ids = [emp.id for emp in individuals]
+            employment_data = get_employee_employment_data(employee_ids, get_latest_access_token())
+            
+            # Build hierarchical org chart data
+            org_chart_data = build_org_chart_data(individuals)
+            
+            # Add job titles to org chart data
+            def add_titles_recursive(employees):
+                for emp in employees:
+                    emp['title'] = employment_data.get(emp['id'], 'Unknown Title')
+                    if emp['children']:
+                        add_titles_recursive(emp['children'])
+            
+            add_titles_recursive(org_chart_data)
+            
+    except APIError as e:
+        if hasattr(e, 'status_code') and e.status_code == 501:
+            error_message = "Directory data unsupported for provider"
+            print(f"{e}")
+        else:
+            error_message = "Could not load directory data."
+            print(f"{e}")
+    except Exception as e:
+        error_message = "Encountered an unexpected error."
+        print(f"{e}")
+
+    return render_template('org_chart.html', org_chart_data=org_chart_data, error_message=error_message)
 
 @app.route('/directory/employee/<employee_id>')
 def employee_detail(employee_id):
