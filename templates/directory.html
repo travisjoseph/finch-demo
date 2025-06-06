@@ -905,6 +905,273 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Deductions Styles */
+        .deductions-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            flex-direction: column;
+            gap: 20px;
+            color: #6c757d;
+        }
+
+        .deductions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 24px;
+        }
+
+        .benefit-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+
+        .benefit-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .benefit-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .benefit-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .benefit-icon.retirement {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .benefit-icon.health {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .benefit-icon.commuter {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .benefit-icon.custom {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .benefit-icon.default {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .benefit-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 4px 0;
+        }
+
+        .benefit-type {
+            font-size: 12px;
+            font-weight: 500;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .benefit-description {
+            color: #495057;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .benefit-details {
+            display: grid;
+            gap: 12px;
+        }
+
+        .benefit-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .benefit-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .benefit-detail-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .benefit-detail-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .frequency-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .frequency-every-paycheck {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .frequency-monthly {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .frequency-one-time {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .company-contribution {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .contribution-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .contribution-tier {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 12px;
+        }
+
+        .contribution-tier:not(:last-child) {
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tier-threshold {
+            color: #6c757d;
+        }
+
+        .tier-match {
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .deductions-search {
+            padding: 24px 24px 0;
+        }
+
+        .deductions-search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .deductions-search-input:focus {
+            outline: none;
+            border-color: #28a745;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .deductions-search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .deductions-summary {
+            padding: 24px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+        }
+
+        .summary-stat {
+            text-align: center;
+        }
+
+        .summary-stat-number {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            color: #28a745;
+            line-height: 1;
+        }
+
+        .summary-stat-label {
+            display: block;
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Tab content styles */
+        .tab-content {
+            display: block;
+        }
+
+        .tab-content.hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .deductions-grid {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .summary-stats {
+                gap: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1013,75 +1280,87 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <div class="content-header">
-                <div class="tabs">
-                    <button class="tab active">Employee List</button>
-                </div>
-                <div class="search-container">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" class="search-input" placeholder="Search by name, department, or employee ID..." id="searchInput">
-                </div>
+        <div class="content-header">
+            <div class="tabs">
+                <button class="tab active" data-tab="employees">Employee List</button>
+                <button class="tab" data-tab="deductions">Deductions</button>
+            </div>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search by name, department, or employee ID..." id="searchInput">
+            </div>
+        </div>
+
+            <!-- Employee List Tab Content -->
+            <div id="employeesTabContent" class="tab-content">
+                {% if directory_error %}
+                    <div class="error-message">
+                        <strong>Error:</strong> {{ directory_error }}
+                    </div>
+                {% elif directory_data %}
+                    <div class="table-container">
+                        <table class="employee-table" id="employeeTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Manager</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in directory_data %}
+                                <tr class="employee-row {{ 'inactive' if not employee.is_active else '' }}" data-name="{{ (employee.first_name + ' ' + employee.last_name).lower() }}" data-department="{{ employee.department.name.lower() if employee.department else '' }}" data-employee-id="{{ employee.id }}" onclick="openEmployeeDrawer('{{ employee.id }}')">
+                                    <td>
+                                        <div class="employee-info">
+                                            <div class="employee-avatar">
+                                                {{ employee.first_name[0] if employee.first_name else '?' }}{{ employee.last_name[0] if employee.last_name else '' }}
+                                            </div>
+                                            <div class="employee-details">
+                                                <h4>{{ employee.first_name }} {% if employee.middle_name %}{{ employee.middle_name[0] }}. {% endif %}{{ employee.last_name }}</h4>
+                                                <p class="copy-id-container">ID: {{ employee.id }}<button class="copy-button" onclick="event.stopPropagation(); copyToClipboard('{{ employee.id }}', this)" title="Copy Employee ID" aria-label="Copy Employee ID">📋</button></p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if employee.department %}
+                                            <span>{{ employee.department.name }}</span>
+                                        {% else %}
+                                            <span class="unavailable">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if employee.manager %}
+                                            <span>{{ employee.manager.id }}</span>
+                                        {% else %}
+                                            <span class="unavailable">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ 'status-active' if employee.is_active else 'status-inactive' }}">
+                                            {{ 'Active' if employee.is_active else 'Inactive' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No employees found</h3>
+                        <p>There are no employees in the directory at this time.</p>
+                    </div>
+                {% endif %}
             </div>
 
-            {% if directory_error %}
-                <div class="error-message">
-                    <strong>Error:</strong> {{ directory_error }}
+            <!-- Deductions Tab Content -->
+            <div id="deductionsTabContent" class="tab-content" style="display: none;">
+                <div class="deductions-loading">
+                    <div class="loading"></div>
+                    <p>Loading deductions data...</p>
                 </div>
-            {% elif directory_data %}
-                <div class="table-container">
-                    <table class="employee-table" id="employeeTable">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Department</th>
-                                <th>Manager</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for employee in directory_data %}
-                            <tr class="employee-row {{ 'inactive' if not employee.is_active else '' }}" data-name="{{ (employee.first_name + ' ' + employee.last_name).lower() }}" data-department="{{ employee.department.name.lower() if employee.department else '' }}" data-employee-id="{{ employee.id }}" onclick="openEmployeeDrawer('{{ employee.id }}')">
-                                <td>
-                                    <div class="employee-info">
-                                        <div class="employee-avatar">
-                                            {{ employee.first_name[0] if employee.first_name else '?' }}{{ employee.last_name[0] if employee.last_name else '' }}
-                                        </div>
-                                        <div class="employee-details">
-                                            <h4>{{ employee.first_name }} {% if employee.middle_name %}{{ employee.middle_name[0] }}. {% endif %}{{ employee.last_name }}</h4>
-                                            <p class="copy-id-container">ID: {{ employee.id }}<button class="copy-button" onclick="event.stopPropagation(); copyToClipboard('{{ employee.id }}', this)" title="Copy Employee ID" aria-label="Copy Employee ID">📋</button></p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    {% if employee.department %}
-                                        <span>{{ employee.department.name }}</span>
-                                    {% else %}
-                                        <span class="unavailable">-</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if employee.manager %}
-                                        <span>{{ employee.manager.id }}</span>
-                                    {% else %}
-                                        <span class="unavailable">-</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="status-badge {{ 'status-active' if employee.is_active else 'status-inactive' }}">
-                                        {{ 'Active' if employee.is_active else 'Inactive' }}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <h3>No employees found</h3>
-                    <p>There are no employees in the directory at this time.</p>
-                </div>
-            {% endif %}
+            </div>
         </div>
     </div>
 
@@ -1952,6 +2231,413 @@
         document.getElementById('employeeDrawer').addEventListener('click', function(e) {
             e.stopPropagation();
         });
+
+        // Main tab functionality
+        let currentMainTab = 'employees';
+        let deductionsData = null;
+
+        // Initialize main tabs
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainTabs = document.querySelectorAll('.tabs .tab');
+            mainTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchMainTab(tabName);
+                });
+            });
+        });
+
+        function switchMainTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.tabs .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`.tabs .tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Show/hide content
+            const employeesContent = document.getElementById('employeesTabContent');
+            const deductionsContent = document.getElementById('deductionsTabContent');
+            
+            if (tabName === 'employees') {
+                employeesContent.style.display = 'block';
+                deductionsContent.style.display = 'none';
+                
+                // Update search placeholder
+                document.getElementById('searchInput').placeholder = 'Search by name, department, or employee ID...';
+                document.getElementById('searchInput').style.display = 'block';
+            } else if (tabName === 'deductions') {
+                employeesContent.style.display = 'none';
+                deductionsContent.style.display = 'block';
+                
+                // Hide search for deductions (we'll add deduction-specific search later)
+                document.getElementById('searchInput').style.display = 'none';
+                
+                // Load deductions data if not already loaded
+                if (!deductionsData) {
+                    loadDeductionsData();
+                }
+            }
+            
+            currentMainTab = tabName;
+        }
+
+        function loadDeductionsData() {
+            const deductionsContent = document.getElementById('deductionsTabContent');
+            
+            // Show loading state
+            deductionsContent.innerHTML = `
+                <div class="deductions-loading">
+                    <div class="loading"></div>
+                    <p>Loading deductions data...</p>
+                </div>
+            `;
+            
+            // Fetch deductions data
+            fetch('/api/deductions')
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+                    
+                    if (!response.ok) {
+                        // Handle non-200 responses by parsing the JSON error
+                        return response.json().then(errorData => {
+                            console.log('Error data from server:', errorData);
+                            throw { status: response.status, data: errorData };
+                        }).catch(jsonError => {
+                            console.log('Failed to parse JSON error:', jsonError);
+                            // If JSON parsing fails, still try to handle as structured error if we have the response
+                            throw { status: response.status, data: null, originalError: jsonError };
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    deductionsData = data;
+                    renderDeductionsContent(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching deductions data:', error);
+                    console.log('Error object:', error);
+                    
+                    // Check if this is a structured error with status and data
+                    if (error.status && error.data) {
+                        console.log('Handling structured error:', error.data);
+                        handleDeductionsError(error.data);
+                    } else if (error.status === 403) {
+                        // Handle 403 without parsed data - try to show reauth prompt anyway
+                        console.log('Handling 403 without parsed data');
+                        
+                        // Try to get connection ID from the current active connection
+                        fetch('/api/active-connection')
+                            .then(response => response.json())
+                            .then(connData => {
+                                const connectionId = connData.connection_id || 'unknown';
+                                handleDeductionsError({
+                                    error_type: 'insufficient_scope',
+                                    missing_scopes: ['benefits'],
+                                    reauth_url: `/reauth/${connectionId}`,
+                                    message: 'Additional permissions needed: benefits'
+                                });
+                            })
+                            .catch(() => {
+                                // Fallback if we can't get connection ID
+                                handleDeductionsError({
+                                    error_type: 'insufficient_scope',
+                                    missing_scopes: ['benefits'],
+                                    reauth_url: null,
+                                    message: 'Additional permissions needed: benefits'
+                                });
+                            });
+                    } else {
+                        console.log('Handling generic error');
+                        // Generic error handling
+                        const deductionsContent = document.getElementById('deductionsTabContent');
+                        deductionsContent.innerHTML = `
+                            <div class="error-message">
+                                <strong>Error:</strong> ${error.message || 'Failed to fetch deductions data'}
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        function renderDeductionsContent(data) {
+            const deductionsContent = document.getElementById('deductionsTabContent');
+            
+            if (data.error) {
+                deductionsContent.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${data.error}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            // Summary section
+            html += `
+                <div class="deductions-summary">
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <span class="summary-stat-number">${data.total_benefits || 0}</span>
+                            <span class="summary-stat-label">Total Benefits</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Search section
+            html += `
+                <div class="deductions-search">
+                    <div style="position: relative;">
+                        <span class="deductions-search-icon">🔍</span>
+                        <input type="text" class="deductions-search-input" placeholder="Search benefits by type or description..." id="deductionsSearchInput">
+                    </div>
+                </div>
+            `;
+
+            if (data.benefits && data.benefits.length > 0) {
+                html += '<div class="deductions-grid">';
+                
+                data.benefits.forEach(benefit => {
+                    html += renderBenefitCard(benefit);
+                });
+                
+                html += '</div>';
+            } else {
+                html += `
+                    <div class="empty-state">
+                        <h3>No Benefits Found</h3>
+                        <p>No company benefits or deductions are available at this time.</p>
+                    </div>
+                `;
+            }
+
+            deductionsContent.innerHTML = html;
+
+            // Add search functionality for deductions
+            const searchInput = document.getElementById('deductionsSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const cards = document.querySelectorAll('.benefit-card');
+                    
+                    cards.forEach(card => {
+                        const type = card.getAttribute('data-type') || '';
+                        const description = card.getAttribute('data-description') || '';
+                        const isVisible = type.includes(searchTerm) || description.includes(searchTerm);
+                        card.style.display = isVisible ? '' : 'none';
+                    });
+                });
+            }
+        }
+
+        function renderBenefitCard(benefit) {
+            const benefitType = benefit.type || 'unknown';
+            const iconClass = getBenefitIconClass(benefitType);
+            const frequencyClass = getFrequencyClass(benefit.frequency);
+            
+            let html = `
+                <div class="benefit-card" data-type="${benefitType.toLowerCase()}" data-description="${(benefit.description || '').toLowerCase()}">
+                    <div class="benefit-header">
+                        <div class="benefit-icon ${iconClass}">
+                            ${getBenefitIcon(benefitType)}
+                        </div>
+                        <div>
+                            <h3 class="benefit-title">${formatBenefitType(benefitType)}</h3>
+                            <span class="benefit-type">${benefitType}</span>
+                        </div>
+                    </div>
+            `;
+
+            if (benefit.description) {
+                html += `<div class="benefit-description">${benefit.description}</div>`;
+            }
+
+            html += '<div class="benefit-details">';
+
+            // Benefit ID
+            html += `
+                <div class="benefit-detail-item">
+                    <span class="benefit-detail-label">Benefit ID</span>
+                    <span class="benefit-detail-value copy-id-container" style="font-family: monospace; font-size: 12px;">
+                        ${benefit.benefit_id}${createCopyButton(benefit.benefit_id, 'Copy Benefit ID')}
+                    </span>
+                </div>
+            `;
+
+            // Frequency
+            if (benefit.frequency) {
+                html += `
+                    <div class="benefit-detail-item">
+                        <span class="benefit-detail-label">Frequency</span>
+                        <span class="benefit-detail-value">
+                            <span class="frequency-badge ${frequencyClass}">${formatFrequency(benefit.frequency)}</span>
+                        </span>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+
+            // Company contribution
+            if (benefit.company_contribution) {
+                html += renderCompanyContribution(benefit.company_contribution);
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function getBenefitIconClass(type) {
+            const retirementTypes = ['401k', '401k_roth', '403b', '403b_roth', '457', '457_roth', 'simple', 'simple_ira'];
+            const healthTypes = ['fsa_dependent_care', 'fsa_medical', 'hsa_post', 'hsa_pre', 's125_dental', 's125_medical', 's125_vision'];
+            const commuterTypes = ['commuter'];
+            const customTypes = ['custom_post_tax', 'custom_pre_tax'];
+
+            if (retirementTypes.includes(type)) return 'retirement';
+            if (healthTypes.includes(type)) return 'health';
+            if (commuterTypes.includes(type)) return 'commuter';
+            if (customTypes.includes(type)) return 'custom';
+            return 'default';
+        }
+
+        function getBenefitIcon(type) {
+            const retirementTypes = ['401k', '401k_roth', '403b', '403b_roth', '457', '457_roth', 'simple', 'simple_ira'];
+            const healthTypes = ['fsa_dependent_care', 'fsa_medical', 'hsa_post', 'hsa_pre', 's125_dental', 's125_medical', 's125_vision'];
+            const commuterTypes = ['commuter'];
+
+            if (retirementTypes.includes(type)) return '🏦';
+            if (healthTypes.includes(type)) return '🏥';
+            if (commuterTypes.includes(type)) return '🚗';
+            return '💼';
+        }
+
+        function formatBenefitType(type) {
+            const typeMap = {
+                '401k': '401(k) Plan',
+                '401k_roth': '401(k) Roth Plan',
+                '401k_loan': '401(k) Loan',
+                '403b': '403(b) Plan',
+                '403b_roth': '403(b) Roth Plan',
+                '457': '457 Plan',
+                '457_roth': '457 Roth Plan',
+                'commuter': 'Commuter Benefits',
+                'custom_post_tax': 'Custom Post-Tax',
+                'custom_pre_tax': 'Custom Pre-Tax',
+                'fsa_dependent_care': 'FSA Dependent Care',
+                'fsa_medical': 'FSA Medical',
+                'hsa_post': 'HSA Post-Tax',
+                'hsa_pre': 'HSA Pre-Tax',
+                's125_dental': 'Section 125 Dental',
+                's125_medical': 'Section 125 Medical',
+                's125_vision': 'Section 125 Vision',
+                'simple': 'SIMPLE Plan',
+                'simple_ira': 'SIMPLE IRA'
+            };
+
+            return typeMap[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function getFrequencyClass(frequency) {
+            const classMap = {
+                'every_paycheck': 'frequency-every-paycheck',
+                'monthly': 'frequency-monthly',
+                'one_time': 'frequency-one-time'
+            };
+            return classMap[frequency] || '';
+        }
+
+        function formatFrequency(frequency) {
+            const frequencyMap = {
+                'every_paycheck': 'Every Paycheck',
+                'monthly': 'Monthly',
+                'one_time': 'One Time'
+            };
+            return frequencyMap[frequency] || frequency.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderCompanyContribution(contribution) {
+            if (!contribution) return '';
+
+            let html = '<div class="company-contribution">';
+            html += '<div class="contribution-header">Company Contribution</div>';
+
+            if (contribution.type) {
+                html += `<div style="margin-bottom: 8px; font-size: 13px; color: #495057;"><strong>Type:</strong> ${contribution.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>`;
+            }
+
+            if (contribution.tiers && contribution.tiers.length > 0) {
+                html += '<div style="margin-top: 8px;">';
+                contribution.tiers.forEach(tier => {
+                    html += '<div class="contribution-tier">';
+                    html += `<span class="tier-threshold">Threshold: $${formatNumber(tier.threshold || 0)}</span>`;
+                    html += `<span class="tier-match">Match: $${formatNumber(tier.match || 0)}</span>`;
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function formatNumber(num) {
+            if (typeof num !== 'number') return '0';
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        function handleDeductionsError(errorData) {
+            const deductionsContent = document.getElementById('deductionsTabContent');
+            
+            // Check if this is an insufficient scope error
+            if (errorData.error_type === 'insufficient_scope') {
+                const missingScopes = errorData.missing_scopes || [];
+                const reauthUrl = errorData.reauth_url;
+                const scopeText = missingScopes.length > 0 ? missingScopes.join(', ') : 'additional permissions';
+                
+                deductionsContent.innerHTML = `
+                    <div style="padding: 60px 24px; text-align: center; background: white;">
+                        <div style="max-width: 500px; margin: 0 auto;">
+                            <div style="width: 80px; height: 80px; margin: 0 auto 24px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                                🔒
+                            </div>
+                            <h3 style="font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 12px;">
+                                Additional Permissions Needed
+                            </h3>
+                            <p style="font-size: 16px; color: #6c757d; margin-bottom: 8px; line-height: 1.5;">
+                                To view company benefits and deductions, we need access to <strong>${scopeText}</strong> data.
+                            </p>
+                            <p style="font-size: 14px; color: #6c757d; margin-bottom: 32px;">
+                                This will only take a moment and won't affect your existing connection.
+                            </p>
+                            ${reauthUrl ? `
+                                <a href="${reauthUrl}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #28a745, #20c997); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(40, 167, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(40, 167, 69, 0.3)'">
+                                    🔓 Add Benefits Access
+                                </a>
+                            ` : `
+                                <a href="/" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #6c757d, #5a6268); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.2s ease;">
+                                    ← Back to Provider Selection
+                                </a>
+                            `}
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e9ecef;">
+                                <p style="font-size: 12px; color: #6c757d; margin: 0;">
+                                    <strong>Secure:</strong> Your data is protected and we only request the minimum permissions needed.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Generic error handling for other types of errors
+                deductionsContent.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${errorData.message || errorData.error || 'Failed to load deductions data'}
+                    </div>
+                `;
+            }
+        }
 
     </script>
 </body>

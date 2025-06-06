@@ -165,10 +165,18 @@
                             {% else %}
                                 <button class="select-button" disabled>Current</button>
                             {% endif %}
-                            {% if not conn.has_payroll %}
-                                <a href="/reauth/{{ conn.connection_id }}" class="reauth-button" title="Reauthenticate with payroll scopes">Add Payroll</a>
+                            {% if not conn.has_payroll or not conn.has_benefits %}
+                                <a href="/reauth/{{ conn.connection_id }}" class="reauth-button" title="Reauthenticate with additional scopes">
+                                    {% if not conn.has_payroll and not conn.has_benefits %}
+                                        Add Payroll & Benefits
+                                    {% elif not conn.has_payroll %}
+                                        Add Payroll
+                                    {% else %}
+                                        Add Benefits
+                                    {% endif %}
+                                </a>
                             {% else %}
-                                <span class="payroll-enabled" title="Payroll permissions already enabled">✓ Payroll</span>
+                                <span class="payroll-enabled" title="Payroll and benefits permissions enabled">✓ Full Access</span>
                             {% endif %}
                         </td>
                     </tr>

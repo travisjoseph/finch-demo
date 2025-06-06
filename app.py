@@ -98,9 +98,10 @@ def home():
     for conn in connections:
         details = get_connection_details(conn['access_token'])
         
-        # Check if connection has payroll scopes
+        # Check if connection has payroll and benefits scopes
         products = conn.get('products', '').split('|') if conn.get('products') else []
         has_payroll = 'payment' in products and 'pay_statement' in products
+        has_benefits = 'benefits' in products
         
         connection_details.append({
             'connection_id': conn['connection_id'],
@@ -109,6 +110,7 @@ def home():
             'status': details['status'],
             'is_active': conn.get('active') == 'True' or (active_conn and conn['connection_id'] == active_conn['connection_id']),
             'has_payroll': has_payroll,
+            'has_benefits': has_benefits,
             'products': products
         })
     
@@ -125,7 +127,7 @@ def select_provider(connection_id):
 
 @app.route('/connect')
 def connect():
-    scopes = ["company", "directory", "individual", "employment"]
+    scopes = ["company", "directory", "individual", "employment", "benefits"]
     
     client = Finch(
         client_id= CLIENT_ID,
@@ -143,9 +145,9 @@ def connect():
 
 @app.route('/reauth/<connection_id>')
 def reauth(connection_id):
-    """Reauthenticate a connection with additional payroll scopes"""
-    # Include payroll scopes for accessing payment and pay statement data
-    scopes = ["company", "directory", "individual", "employment", "payment", "pay_statement"]
+    """Reauthenticate a connection with additional payroll and benefits scopes"""
+    # Include all scopes for accessing payment, pay statement, and benefits data
+    scopes = ["company", "directory", "individual", "employment", "payment", "pay_statement", "benefits"]
     
     client = Finch(
         client_id= CLIENT_ID,
@@ -550,6 +552,170 @@ def api_employee_payments(employee_id):
         return jsonify({'error': error_msg}), 400
     except Exception as e:
         error_msg = f"Unexpected error: {e}"
+        return jsonify({'error': error_msg}), 500
+
+
+@app.route('/api/active-connection')
+def api_active_connection():
+    """API endpoint that returns the current active connection details"""
+    try:
+        active_conn = get_active_connection()
+        if active_conn:
+            return jsonify({
+                'connection_id': active_conn['connection_id'],
+                'provider_id': active_conn['provider_id'],
+                'products': active_conn.get('products', '').split('|') if active_conn.get('products') else []
+            })
+        else:
+            return jsonify({'error': 'No active connection found'}), 404
+    except Exception as e:
+        return jsonify({'error': f'Failed to get active connection: {str(e)}'}), 500
+
+
+@app.route('/api/deductions')
+def api_deductions():
+    """API endpoint that returns all company benefits/deductions"""
+    print("\n" + "="*80)
+    print("DEDUCTIONS API ENDPOINT CALLED")
+    print("="*80)
+    
+    try:
+        # Get access token
+        access_token = get_latest_access_token()
+        print(f"Access token retrieved: {access_token[:20]}..." if access_token else "No access token")
+        
+        client = Finch(
+            access_token=access_token,
+        )
+        print("Finch client created successfully")
+        
+        # Get all company benefits/deductions
+        print("Attempting to fetch benefits from Finch API...")
+        benefits = client.hris.benefits.list()
+        print(f"Benefits fetched successfully. Type: {type(benefits)}")
+        print(f"Benefits object: {benefits}")
+        
+        # Convert benefits to list of dictionaries for JSON serialization
+        benefits_list = []
+        benefit_count = 0
+        
+        print("Processing benefits...")
+        for benefit in benefits:
+            benefit_count += 1
+            print(f"Processing benefit {benefit_count}: {benefit}")
+            print(f"Benefit type: {type(benefit)}")
+            print(f"Benefit attributes: {dir(benefit)}")
+            
+            try:
+                benefit_data = {
+                    'benefit_id': getattr(benefit, 'benefit_id', None),
+                    'type': getattr(benefit, 'type', None),
+                    'description': getattr(benefit, 'description', None),
+                    'frequency': getattr(benefit, 'frequency', None),
+                    'company_contribution': None
+                }
+                print(f"Basic benefit data: {benefit_data}")
+                
+                # Handle company contribution if present
+                if hasattr(benefit, 'company_contribution') and benefit.company_contribution:
+                    print(f"Processing company contribution: {benefit.company_contribution}")
+                    contribution_data = {
+                        'type': getattr(benefit.company_contribution, 'type', None),
+                        'tiers': []
+                    }
+                    
+                    # Handle tiers if present
+                    if hasattr(benefit.company_contribution, 'tiers') and benefit.company_contribution.tiers:
+                        print(f"Processing tiers: {benefit.company_contribution.tiers}")
+                        for tier_idx, tier in enumerate(benefit.company_contribution.tiers):
+                            print(f"Processing tier {tier_idx}: {tier}")
+                            tier_data = {}
+                            if hasattr(tier, 'threshold'):
+                                tier_data['threshold'] = tier.threshold
+                            if hasattr(tier, 'match'):
+                                tier_data['match'] = tier.match
+                            contribution_data['tiers'].append(tier_data)
+                            print(f"Tier data: {tier_data}")
+                    
+                    benefit_data['company_contribution'] = contribution_data
+                    print(f"Final contribution data: {contribution_data}")
+                
+                benefits_list.append(benefit_data)
+                print(f"Benefit {benefit_count} processed successfully")
+                
+            except Exception as benefit_error:
+                print(f"Error processing benefit {benefit_count}: {benefit_error}")
+                print(f"Benefit object that caused error: {benefit}")
+                # Continue processing other benefits
+                continue
+        
+        print(f"Total benefits processed: {len(benefits_list)}")
+        
+        response_data = {
+            'benefits': benefits_list,
+            'total_benefits': len(benefits_list)
+        }
+        print(f"Final response data: {response_data}")
+        
+        return jsonify(response_data)
+        
+    except APIError as e:
+        error_msg = f"Finch API Error: {e}"
+        print(f"API ERROR: {error_msg}")
+        print(f"API Error details - Status: {getattr(e, 'status_code', 'Unknown')}")
+        print(f"API Error details - Response: {getattr(e, 'response', 'Unknown')}")
+        print(f"API Error details - Body: {getattr(e, 'body', 'Unknown')}")
+        
+        # Check for insufficient scope error (403)
+        if hasattr(e, 'status_code') and e.status_code == 403:
+            # Try to parse the error body for scope information
+            error_body = getattr(e, 'body', {})
+            if isinstance(error_body, dict):
+                error_code = error_body.get('code')
+                error_name = error_body.get('name')
+                error_message = error_body.get('message', '')
+                
+                print(f"Error code: {error_code}")
+                print(f"Error name: {error_name}")
+                print(f"Error message: {error_message}")
+                
+                if error_name == 'insufficient_scope_error':
+                    # Extract missing scopes from the error message
+                    missing_scopes = []
+                    if 'Missing scopes:' in error_message:
+                        # Parse something like "Missing scopes: [benefits]"
+                        import re
+                        scope_match = re.search(r'Missing scopes:\s*\[([^\]]+)\]', error_message)
+                        if scope_match:
+                            scopes_str = scope_match.group(1)
+                            missing_scopes = [scope.strip().strip('"\'') for scope in scopes_str.split(',')]
+                    
+                    print(f"Parsed missing scopes: {missing_scopes}")
+                    
+                    # Get current connection ID for reauth URL
+                    active_conn = get_active_connection()
+                    connection_id = active_conn['connection_id'] if active_conn else None
+                    
+                    response_data = {
+                        'error_type': 'insufficient_scope',
+                        'missing_scopes': missing_scopes,
+                        'reauth_url': f'/reauth/{connection_id}' if connection_id else None,
+                        'message': f'Additional permissions needed: {", ".join(missing_scopes)}' if missing_scopes else 'Additional permissions needed',
+                        'connection_id': connection_id
+                    }
+                    
+                    print(f"Returning structured error response: {response_data}")
+                    return jsonify(response_data), 403
+        
+        if hasattr(e, 'status_code') and e.status_code == 501:
+            error_msg = "Benefits/deductions data unsupported for this provider"
+        return jsonify({'error': error_msg}), 400
+    except Exception as e:
+        error_msg = f"Unexpected error: {e}"
+        print(f"UNEXPECTED ERROR: {error_msg}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Full traceback: {traceback.format_exc()}")
         return jsonify({'error': error_msg}), 500
 
 

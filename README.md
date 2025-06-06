@@ -39,6 +39,25 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Intelligent Deductions Management with Smart Scope Handling
+- **Complete Deductions Integration**: Added comprehensive deductions/benefits functionality using Finch's benefits API
+- **New Deductions Tab**: Professional tab interface alongside Employee List for viewing all company benefits
+- **Modern Benefits Cards**: Beautiful card-based UI with color-coded icons for different benefit types:
+  - Retirement plans (401k, 403b, 457, SIMPLE IRA) with bank icons
+  - Health benefits (HSA, FSA, Section 125) with medical icons  
+  - Commuter benefits with transportation icons
+  - Custom deductions with appropriate categorization
+- **Intelligent Scope Management**: Revolutionary error handling that detects insufficient permissions and guides users through reauthentication
+  - Automatic detection of 403 insufficient_scope_error responses
+  - Professional reauth prompts with clear messaging and direct action buttons
+  - "🔓 Add Benefits Access" button for seamless OAuth flow integration
+  - Smart fallback handling for edge cases and connection management
+- **Enhanced Search & Filter**: Real-time search functionality for filtering benefits by type or description
+- **Company Contribution Details**: Comprehensive display of employer matching with tier information and thresholds
+- **Copy-to-Clipboard Integration**: Benefit IDs can be easily copied with visual feedback
+- **Responsive Design**: Fully responsive interface that works seamlessly on desktop and mobile
+- **Production-Ready Architecture**: Clean API endpoints, proper error handling, and professional UI/UX
+
 ### Professional UI/UX Enhancements and Navigation Improvements
 - **Human-Readable Date Formatting**: All dates throughout the application now display in "Month DD, YYYY" format instead of numeric format
   - Employee dates of birth, employment start/end dates, and income history dates
