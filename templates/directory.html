@@ -344,6 +344,144 @@
             }
         }
 
+        /* Company Card Styles */
+        .company-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .company-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .company-main-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+
+        .company-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .company-ein,
+        .company-contact {
+            font-size: 14px;
+            color: #6c757d;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .company-error {
+            color: #dc3545;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .company-stats {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            color: #28a745;
+            line-height: 1;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+
+        .company-details {
+            border-top: 1px solid #e9ecef;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .detail-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 4px;
+        }
+
+        .detail-item {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .detail-item strong {
+            color: #495057;
+            min-width: 100px;
+            display: inline-block;
+        }
+
+        .detail-item span {
+            color: #6c757d;
+        }
+
+        .department-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .department-tag {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .location-item {
+            background-color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
         /* Loading Animation */
         .loading {
             display: inline-block;
@@ -359,6 +497,29 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Responsive updates for company card */
+        @media (max-width: 768px) {
+            .company-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .company-stats {
+                justify-content: center;
+                gap: 16px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .company-meta {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -373,6 +534,100 @@
             </div>
         </div>
 
+        <!-- Company Info Card -->
+        {% if company_data or company_error %}
+        <div class="company-card">
+            <div class="company-header">
+                <div class="company-main-info">
+                    {% if company_data %}
+                        <h2 class="company-name">{{ company_data.legal_name or 'Company Name Unavailable' }}</h2>
+                        <div class="company-meta">
+                            {% if company_data.ein %}
+                                <span class="company-ein">EIN: {{ company_data.ein }}</span>
+                            {% endif %}
+                            {% if company_data.primary_email %}
+                                <span class="company-contact">{{ company_data.primary_email }}</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <h2 class="company-name">Company Information</h2>
+                        <div class="company-error">{{ company_error }}</div>
+                    {% endif %}
+                </div>
+                <div class="company-stats">
+                    {% if company_data %}
+                        {% if company_data.departments %}
+                            <div class="stat-item">
+                                <span class="stat-number">{{ company_data.departments|length }}</span>
+                                <span class="stat-label">Departments</span>
+                            </div>
+                        {% endif %}
+                        {% if company_data.locations %}
+                            <div class="stat-item">
+                                <span class="stat-number">{{ company_data.locations|length }}</span>
+                                <span class="stat-label">Locations</span>
+                            </div>
+                        {% endif %}
+                        {% if directory_data %}
+                            <div class="stat-item">
+                                <span class="stat-number">{{ directory_data|length }}</span>
+                                <span class="stat-label">Employees</span>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if company_data %}
+            <div class="company-details">
+                <div class="details-grid">
+                    <div class="detail-section">
+                        <h4>Contact Information</h4>
+                        <div class="detail-item">
+                            <strong>Email:</strong> 
+                            <span>{{ company_data.primary_email or 'Not available' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Phone:</strong> 
+                            <span>{{ company_data.primary_phone_number or 'Not available' }}</span>
+                        </div>
+                        {% if company_data.entity %}
+                        <div class="detail-item">
+                            <strong>Entity Type:</strong> 
+                            <span>{{ company_data.entity.type or 'Not available' }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if company_data.departments %}
+                    <div class="detail-section">
+                        <h4>Departments</h4>
+                        <div class="department-list">
+                            {% for department in company_data.departments %}
+                                <span class="department-tag">{{ department.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if company_data.locations %}
+                    <div class="detail-section">
+                        <h4>Locations</h4>
+                        {% for location in company_data.locations %}
+                        <div class="location-item">
+                            {% if location.name %}<strong>{{ location.name }}</strong><br>{% endif %}
+                            {{ location.line1 or '' }}{% if location.line2 %}, {{ location.line2 }}{% endif %}<br>
+                            {{ location.city or '' }}{% if location.state %}, {{ location.state }}{% endif %} {{ location.postal_code or '' }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <!-- Main Content -->
         <div class="main-content">
             <div class="content-header">
@@ -385,9 +640,9 @@
                 </div>
             </div>
 
-            {% if error_message %}
+            {% if directory_error %}
                 <div class="error-message">
-                    <strong>Error:</strong> {{ error_message }}
+                    <strong>Error:</strong> {{ directory_error }}
                 </div>
             {% elif directory_data %}
                 <div class="table-container">
@@ -473,6 +728,7 @@
                 this.innerHTML = '<span class="loading"></span>';
             });
         });
+
     </script>
 </body>
 </html>

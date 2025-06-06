@@ -271,21 +271,41 @@ def directory():
 
     # Get individual data, handles compatibility issues with custom message
     individuals = []
-    error_message = None
+    directory_error = None
     try:
         individuals = client.hris.directory.list().individuals
     except APIError as e:
         if hasattr(e, 'status_code') and e.status_code == 501:
-            error_message = "Directory data unsupported for provider"
+            directory_error = "Directory data unsupported for provider"
             print(f"{e}")
         else:
-            error_message = "Could not load directory data."
+            directory_error = "Could not load directory data."
             print(f"{e}")
     except Exception as e:
-        error_message = "Encountered an unexpected error."
+        directory_error = "Encountered an unexpected error."
         print(f"{e}")
 
-    return render_template('directory.html', directory_data=individuals, error_message=error_message)
+    # Get company data for the top card
+    company_data = None 
+    company_error = None
+    try:
+        company_data = client.hris.company.retrieve()
+    except APIError as e:
+        if hasattr(e, 'status_code') and e.status_code == 501:
+            company_error = "Company data unsupported for provider"
+            print(f"{e}")
+        else:
+            company_error = "Could not load company data."
+            print(f"{e}")
+    except Exception as e:
+        company_error = "Encountered an unexpected error."
+        print(f"{e}")
+
+    return render_template('directory.html', 
+                         directory_data=individuals, 
+                         directory_error=directory_error,
+                         company_data=company_data,
+                         company_error=company_error)
 
 @app.route('/org-chart')
 def org_chart():
@@ -389,4 +409,4 @@ def employee_detail(employee_id):
                            employment_error=employment_error)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

@@ -67,3 +67,13 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 - Added consistent navigation bars with "Back to Provider Selection" options
 - Improved user experience for managing multiple provider connections
 - Updated CSV structure to track active provider connections
+
+### Integrated Company Information Card in Employee Directory
+- Added comprehensive company information card displayed above employee table
+- Shows key company details including name, EIN, contact information, and statistics
+- Displays department count, location count, and employee count in an organized layout
+- Integrated detailed company sections for contact info, departments, and locations
+- Features modern card design with professional styling that matches the directory interface
+- Provides immediate company context while browsing employees for better user experience
+- Maintains all existing directory functionality including search and employee details
+- Responsive design ensures optimal viewing on both desktop and mobile devices
