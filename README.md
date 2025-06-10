@@ -39,6 +39,21 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 
 ## Changelog
 
+### Provider Sandbox Selection with Modal Interface
+- **Professional Sandbox Selection Modal**: Added elegant modal dialog for choosing testing environments when connecting new providers
+- **Two Testing Options**: Clear choice between Finch Sandbox (mock data) and Provider Sandbox (real provider test environments)
+  - **🧪 Finch Sandbox**: Instant setup with mock data, perfect for quick development and testing
+  - **🏢 Provider Sandbox**: Real provider environments (Gusto, Deel, Square, etc.) requiring demo accounts
+- **Enhanced Connect Flow**: Updated `/connect` route to handle `sandbox_type` parameter for dynamic sandbox selection
+- **Modern UI/UX**: Professional modal design with:
+  - Responsive layout that adapts to mobile and desktop
+  - Smooth animations and hover effects
+  - Keyboard support (ESC key) and click-outside-to-close
+  - Clear visual hierarchy with descriptive text and icons
+- **Seamless Integration**: Minimal code changes leveraging existing `sandbox_selection` variable
+- **Backward Compatible**: Maintains all existing functionality while adding new testing capabilities
+- **Educational Interface**: Helps users understand different Finch testing environments and their use cases
+
 ### Intelligent Deductions Management with Smart Scope Handling
 - **Complete Deductions Integration**: Added comprehensive deductions/benefits functionality using Finch's benefits API
 - **New Deductions Tab**: Professional tab interface alongside Employee List for viewing all company benefits

@@ -129,6 +129,15 @@ def select_provider(connection_id):
 def connect():
     scopes = ["company", "directory", "individual", "employment", "benefits"]
     
+    # Get sandbox type from URL parameter and set sandbox_selection accordingly
+    sandbox_type = request.args.get('sandbox_type', '')
+    if sandbox_type == 'finch':
+        sandbox_selection = "finch"
+    elif sandbox_type == 'provider':
+        sandbox_selection = "provider"
+    else:
+        sandbox_selection = ""  # Default (production)
+    
     client = Finch(
         client_id= CLIENT_ID,
         client_secret= CLIENT_SECRET
@@ -138,7 +147,8 @@ def connect():
         customer_id = str(uuid.uuid4()),
         customer_name="x",
         products=scopes,
-        redirect_uri = REDIRECT_URI    
+        redirect_uri = REDIRECT_URI,
+        sandbox = sandbox_selection
     )
 
     return redirect(response.connect_url)
