@@ -129,6 +129,7 @@ dmypy.json
 # Specific project rules
 # Ignore sensitive token file
 tokens.csv
+jobs.csv
 
 # Keep example env file, even if other .env files are ignored
 !.env.local.example
