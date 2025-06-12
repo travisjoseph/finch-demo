@@ -22,9 +22,9 @@ pip install -r requirements.txt
 ```
 python3 app.py
 ```
-6. Navigate to `localhost:5000` in your browser to start connecting to providers.
+6. Navigate to `localhost:5001` in your browser to start connecting to providers.
 
-The app should be running on `localhost:5000`. If it is not, please update the `REDIRECT_URI` in `.env.local` and on the Dashboard accordingly.
+The app should be running on `localhost:5001`. If it is not, please update the `REDIRECT_URI` in `.env.local` and on the Dashboard accordingly.
 You can use demo credentials found [here](https://developer.tryfinch.com/implementation-guide/Test/Finch-Sandbox#simulating-credential-flows) in order to connect to providers in Connect.
 
 
@@ -38,6 +38,29 @@ You can use demo credentials found [here](https://developer.tryfinch.com/impleme
 - This app stores tokens in a `.csv` locally. **This is not inteded for production use**. If the `tokens.csv` file does not exist, the app will create one. If multiple providers are connected, the applicaiton will fetch data from the most recent connected provider by default.
 
 ## Changelog
+
+### Automated Job Management with Real-time Tracking
+- **Complete Job Management System**: Added comprehensive automated job functionality for data synchronization
+- **Job Enqueue API**: New `POST /api/jobs/enqueue` endpoint creates `data_sync_all` jobs via Finch API
+- **Real-time Job Tracking**: Live status updates with auto-refresh every 10 seconds for active jobs
+- **Professional Job Cards**: Beautiful UI cards displaying:
+  - Color-coded status badges (⏳ pending, 🔄 in_progress, ✅ complete, ❌ error)
+  - Detailed timeline with formatted timestamps (Created → Scheduled → Started → Completed)
+  - Duration tracking and rate limit information
+  - Copy-to-clipboard job IDs with visual feedback
+- **Expandable Job Details**: Comprehensive details view with:
+  - Full job information including connection and provider details
+  - Complete timeline with human-readable dates
+  - Rate limiting status and refresh counts
+  - Direct links to Finch job URLs
+- **Persistent Job Storage**: New `jobs.csv` file tracks all jobs per provider connection
+- **Enhanced API Endpoints**: 
+  - `GET /api/jobs/status/<job_id>` - Retrieves current job status from Finch API
+  - `GET /api/jobs/list` - Lists all jobs for active connection
+- **Intelligent Auto-refresh**: Automatically polls job status for pending/in-progress jobs
+- **Professional Error Handling**: Comprehensive error messages and graceful fallbacks
+- **Streamlined UI**: Clean interface with essential actions (Refresh and Details)
+- **Server-side Authentication**: All Finch API calls handled server-side to avoid CORS issues
 
 ### Provider Sandbox Selection with Modal Interface
 - **Professional Sandbox Selection Modal**: Added elegant modal dialog for choosing testing environments when connecting new providers

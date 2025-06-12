@@ -1,0 +1,3 @@
+job_id,connection_id,provider_id,job_type,status,created_at,scheduled_at,started_at,completed_at,job_url,allowed_refreshes,remaining_refreshes,error_message
+41b5a3d1-c495-4574-a86d-fa14645b4bc0,d7c9e2f5-d332-465b-aa94-49834d69f994,square_payroll,data_sync_all,complete,2025-06-12T13:36:28.018230,,2025-06-12 20:37:01.626000+00:00,2025-06-12 20:37:24.355000+00:00,https://api.tryfinch.com/jobs/automated/41b5a3d1-c495-4574-a86d-fa14645b4bc0,1,0,
+20d08e68-5d27-453b-b319-6263c024420c,725dcaab-ff21-4ea4-8afd-be8b42601578,gusto,data_sync_all,pending,2025-06-12T14:02:33.420911,,,,https://api.tryfinch.com/jobs/automated/20d08e68-5d27-453b-b319-6263c024420c,1,0,

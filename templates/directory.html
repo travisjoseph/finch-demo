@@ -1162,6 +1162,21 @@
             display: none;
         }
 
+        /* Clickable benefit cards */
+        .clickable-benefit {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clickable-benefit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .clickable-benefit:active {
+            transform: translateY(-1px);
+        }
+
         @media (max-width: 768px) {
             .deductions-grid {
                 grid-template-columns: 1fr;
@@ -1445,10 +1460,16 @@
             const drawer = document.getElementById('employeeDrawer');
             const content = document.getElementById('drawerContent');
             
+            // Reset drawer tabs to employee tabs
+            const drawerTabs = document.getElementById('drawerTabs');
+            drawerTabs.innerHTML = `
+                <button class="drawer-tab active" data-tab="overview">Overview</button>
+                <button class="drawer-tab" data-tab="employment">Employment</button>
+                <button class="drawer-tab" data-tab="payments">Payments</button>
+            `;
+            
             // Reset to overview tab
             activeTab = 'overview';
-            document.querySelectorAll('.drawer-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector('[data-tab="overview"]').classList.add('active');
             
             // Show loading state
             content.innerHTML = `
@@ -2439,7 +2460,7 @@
             const frequencyClass = getFrequencyClass(benefit.frequency);
             
             let html = `
-                <div class="benefit-card" data-type="${benefitType.toLowerCase()}" data-description="${(benefit.description || '').toLowerCase()}">
+                <div class="benefit-card clickable-benefit" data-type="${benefitType.toLowerCase()}" data-description="${(benefit.description || '').toLowerCase()}" onclick="openBenefitDrawer('${benefit.benefit_id}', ${JSON.stringify(benefit).replace(/"/g, '&quot;')})">
                     <div class="benefit-header">
                         <div class="benefit-icon ${iconClass}">
                             ${getBenefitIcon(benefitType)}
@@ -2637,6 +2658,249 @@
                     </div>
                 `;
             }
+        }
+
+        // Benefit drawer functionality
+        function openBenefitDrawer(benefitId, benefitData) {
+            console.log('Opening benefit drawer for:', benefitId, benefitData);
+            
+            const overlay = document.getElementById('drawerOverlay');
+            const drawer = document.getElementById('employeeDrawer');
+            const content = document.getElementById('drawerContent');
+            
+            // Update drawer header for benefit context
+            const profileAvatar = document.getElementById('profileAvatar');
+            const profileName = document.getElementById('profileName');
+            const profileId = document.getElementById('profileId');
+            const statusBadges = document.getElementById('statusBadges');
+            
+            // Set benefit icon based on type
+            const benefitIcon = getBenefitIcon(benefitData.type || 'unknown');
+            profileAvatar.textContent = benefitIcon;
+            
+            // Set benefit name and ID
+            profileName.textContent = formatBenefitType(benefitData.type || 'Unknown Benefit');
+            profileId.innerHTML = `<span class="copy-id-container">ID: ${benefitId}${createCopyButton(benefitId, 'Copy Benefit ID')}</span>`;
+            
+            // Set benefit type badge
+            statusBadges.innerHTML = `<span class="status-badge-modern" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3);">${benefitData.type || 'Unknown'}</span>`;
+            
+            // Update drawer tabs for benefit context
+            const drawerTabs = document.getElementById('drawerTabs');
+            drawerTabs.innerHTML = '<button class="drawer-tab active" data-tab="enrolled">Enrolled Employees</button>';
+            
+            // Show loading state
+            content.innerHTML = `
+                <div class="drawer-loading">
+                    <div class="drawer-loading-spinner"></div>
+                    <p class="drawer-loading-text">Loading enrolled employees...</p>
+                </div>
+            `;
+            
+            // Show drawer
+            overlay.classList.add('active');
+            drawer.classList.add('active');
+            
+            // Fetch enrolled individuals data
+            fetch(`/api/deductions/${benefitId}/enrolled`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch enrolled individuals');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    renderBenefitEnrolledContent(data, benefitData);
+                })
+                .catch(error => {
+                    console.error('Error fetching enrolled individuals:', error);
+                    content.innerHTML = `
+                        <div class="drawer-error">
+                            <div class="drawer-error-icon">!</div>
+                            <div>
+                                <strong>Error:</strong> Failed to load enrolled employees. ${error.message}
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderBenefitEnrolledContent(enrolledData, benefitData) {
+            const content = document.getElementById('drawerContent');
+            
+            if (enrolledData.error) {
+                content.innerHTML = `
+                    <div class="drawer-error">
+                        <div class="drawer-error-icon">!</div>
+                        <div>
+                            <strong>Error:</strong> ${enrolledData.error}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="drawer-tab-content">';
+            
+            // Summary card
+            html += `
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-card-icon employment">👥</div>
+                        <h3 class="info-card-title">Enrollment Summary</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Total Enrolled</div>
+                            <div class="info-value">${enrolledData.total_enrolled || 0}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Benefit Type</div>
+                            <div class="info-value">${formatBenefitType(benefitData.type || 'Unknown')}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Enrolled employees list
+            if (enrolledData.enrolled_individuals && enrolledData.enrolled_individuals.length > 0) {
+                html += `
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-card-icon personal">📋</div>
+                            <h3 class="info-card-title">Enrolled Employees</h3>
+                        </div>
+                        <div style="padding: 0;">
+                `;
+
+                // Add search functionality for enrolled employees
+                html += `
+                    <div style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 14px;">🔍</span>
+                            <input type="text" id="enrolledSearchInput" placeholder="Search enrolled employees..." style="width: 100%; padding: 8px 12px 8px 32px; border: 1px solid #dee2e6; border-radius: 6px; font-size: 14px;">
+                        </div>
+                    </div>
+                `;
+
+                enrolledData.enrolled_individuals.forEach((employee, index) => {
+                    const firstName = employee.first_name || '';
+                    const lastName = employee.last_name || '';
+                    const fullName = `${firstName} ${lastName}`.trim() || 'Unknown Employee';
+                    const initials = `${firstName.charAt(0) || '?'}${lastName.charAt(0) || ''}`;
+                    const department = employee.department && employee.department.name ? employee.department.name : 'Unknown Department';
+                    const isActive = employee.is_active;
+                    
+                    html += `
+                        <div class="enrolled-employee-item" data-name="${fullName.toLowerCase()}" data-department="${department.toLowerCase()}" data-employee-id="${employee.id}" onclick="switchToEmployeeDrawer('${employee.id}')" style="padding: 16px 20px; border-bottom: 1px solid #f1f3f4; cursor: pointer; transition: background-color 0.2s ease; display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #28a745, #20c997); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">
+                                ${initials}
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; color: #1e293b; font-size: 14px; margin-bottom: 2px;">${fullName}</div>
+                                <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px;">
+                                    <span>ID: ${employee.id}</span>
+                                    <span>•</span>
+                                    <span>${department}</span>
+                                    ${isActive !== null && isActive !== undefined ? `
+                                        <span>•</span>
+                                        <span class="status-badge" style="padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 500; text-transform: uppercase; ${isActive ? 'background-color: #d4edda; color: #155724;' : 'background-color: #f8d7da; color: #721c24;'}">${isActive ? 'Active' : 'Inactive'}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div></div>';
+            } else {
+                html += `
+                    <div class="info-card">
+                        <div class="empty-state" style="padding: 40px 20px;">
+                            <h3>No Enrolled Employees</h3>
+                            <p>No employees are currently enrolled in this benefit.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            // Add search functionality for enrolled employees
+            const enrolledSearchInput = document.getElementById('enrolledSearchInput');
+            if (enrolledSearchInput) {
+                enrolledSearchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const employeeItems = document.querySelectorAll('.enrolled-employee-item');
+                    
+                    employeeItems.forEach(item => {
+                        const name = item.getAttribute('data-name') || '';
+                        const department = item.getAttribute('data-department') || '';
+                        const employeeId = item.getAttribute('data-employee-id').toLowerCase();
+                        const isVisible = name.includes(searchTerm) || department.includes(searchTerm) || employeeId.includes(searchTerm);
+                        item.style.display = isVisible ? 'flex' : 'none';
+                    });
+                });
+            }
+        }
+
+        function switchToEmployeeDrawer(employeeId) {
+            // Instead of closing and reopening, just transition the content
+            const drawerTabs = document.getElementById('drawerTabs');
+            const content = document.getElementById('drawerContent');
+            
+            // Reset drawer tabs to employee tabs
+            drawerTabs.innerHTML = `
+                <button class="drawer-tab active" data-tab="overview">Overview</button>
+                <button class="drawer-tab" data-tab="employment">Employment</button>
+                <button class="drawer-tab" data-tab="payments">Payments</button>
+            `;
+            
+            // Reset to overview tab
+            activeTab = 'overview';
+            
+            // Show loading state
+            content.innerHTML = `
+                <div class="drawer-loading">
+                    <div class="drawer-loading-spinner"></div>
+                    <p class="drawer-loading-text">Loading employee details...</p>
+                </div>
+            `;
+            
+            // Reset profile header
+            document.getElementById('profileAvatar').textContent = '?';
+            document.getElementById('profileName').textContent = 'Employee Details';
+            document.getElementById('profileId').textContent = 'Loading...';
+            document.getElementById('statusBadges').innerHTML = '';
+            
+            // Initialize tabs
+            initializeTabs();
+            
+            // Fetch employee data
+            fetch(`/api/employee/${employeeId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch employee data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    currentEmployeeData = data;
+                    updateProfileHeader(data);
+                    renderTabContent(data, activeTab);
+                })
+                .catch(error => {
+                    console.error('Error fetching employee data:', error);
+                    content.innerHTML = `
+                        <div class="drawer-error">
+                            <div class="drawer-error-icon">!</div>
+                            <div>
+                                <strong>Error:</strong> Failed to load employee details. Please try again.
+                            </div>
+                        </div>
+                    `;
+                });
         }
 
     </script>

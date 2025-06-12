@@ -247,6 +247,142 @@
             }
         }
         
+        /* Job Management Styles */
+        .job-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .job-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .job-id {
+            font-family: monospace;
+            font-size: 14px;
+            color: #6c757d;
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .job-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .job-status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .job-status.in_progress {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .job-status.complete {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .job-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .job-status.reauth_error {
+            background-color: #ffeaa7;
+            color: #6c5ce7;
+        }
+        
+        .job-status.permissions_error {
+            background-color: #fab1a0;
+            color: #e17055;
+        }
+        
+        .job-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .job-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .job-actions {
+            margin-top: 10px;
+        }
+        
+        .job-action-btn {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        
+        .job-action-btn:hover {
+            background-color: #138496;
+        }
+        
+        .copy-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .copy-btn.copied {
+            background-color: #28a745;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
         /* Responsive design for mobile */
         @media (max-width: 768px) {
             .sandbox-options {
@@ -258,6 +394,12 @@
                 margin: 5% auto;
                 padding: 20px;
                 width: 95%;
+            }
+            
+            .job-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
             }
         }
     </style>
@@ -328,6 +470,29 @@
         </div>
         
         {% if connections %}
+        <!-- Data Sync Jobs Section -->
+        <div class="connections-section" id="jobsSection">
+            <div class="section-title">🔄 Data Sync Jobs</div>
+            <div style="margin-bottom: 20px;">
+                <button id="startJobBtn" class="connect-new-button" style="margin: 0; padding: 10px 20px; font-size: 14px;">
+                    🚀 Start Data Sync
+                </button>
+                <button id="refreshJobsBtn" class="reauth-button" style="margin-left: 10px; padding: 10px 20px; font-size: 14px;">
+                    📊 Refresh Status
+                </button>
+            </div>
+            
+            <div id="jobsContainer">
+                <div id="jobsLoading" style="text-align: center; color: #666; font-style: italic; display: none;">
+                    Loading jobs...
+                </div>
+                <div id="jobsList"></div>
+                <div id="noJobs" style="text-align: center; color: #666; font-style: italic; margin: 20px 0;">
+                    No data sync jobs yet. Click "Start Data Sync" to begin.
+                </div>
+            </div>
+        </div>
+        
         <div style="text-align: center; margin-top: 20px;">
             <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
                 Select a provider above to switch active connection, or view your employee directory below.
@@ -361,6 +526,11 @@
     </div>
 
     <script>
+        // Global variables
+        let jobRefreshInterval = null;
+        let activeJobs = new Set();
+
+        // Sandbox modal functions
         function showSandboxModal() {
             document.getElementById('sandboxModal').style.display = 'block';
         }
@@ -372,6 +542,336 @@
         function connectSandbox(sandboxType) {
             window.location.href = '/connect?sandbox_type=' + sandboxType;
         }
+
+        // Job management functions
+        async function startDataSyncJob() {
+            const startBtn = document.getElementById('startJobBtn');
+            const originalText = startBtn.textContent;
+            
+            try {
+                startBtn.disabled = true;
+                startBtn.textContent = '⏳ Starting...';
+                
+                const response = await fetch('/api/jobs/enqueue', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✅ Data sync job started successfully!', 'success');
+                    activeJobs.add(data.job_id);
+                    await loadJobs();
+                    startAutoRefresh();
+                } else {
+                    showMessage(`❌ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Network error: ${error.message}`, 'error');
+            } finally {
+                startBtn.disabled = false;
+                startBtn.textContent = originalText;
+            }
+        }
+
+        async function loadJobs() {
+            const jobsLoading = document.getElementById('jobsLoading');
+            const jobsList = document.getElementById('jobsList');
+            const noJobs = document.getElementById('noJobs');
+            
+            try {
+                jobsLoading.style.display = 'block';
+                
+                const response = await fetch('/api/jobs/list');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.jobs && data.jobs.length > 0) {
+                        jobsList.innerHTML = data.jobs.map(job => createJobCard(job)).join('');
+                        noJobs.style.display = 'none';
+                        
+                        // Track active jobs for auto-refresh
+                        activeJobs.clear();
+                        data.jobs.forEach(job => {
+                            if (job.status === 'pending' || job.status === 'in_progress') {
+                                activeJobs.add(job.job_id);
+                            }
+                        });
+                    } else {
+                        jobsList.innerHTML = '';
+                        noJobs.style.display = 'block';
+                        activeJobs.clear();
+                    }
+                } else {
+                    showMessage(`❌ Error loading jobs: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Network error: ${error.message}`, 'error');
+            } finally {
+                jobsLoading.style.display = 'none';
+            }
+        }
+
+        function createJobCard(job) {
+            const statusIcon = getStatusIcon(job.status);
+            const timeAgo = getTimeAgo(job.created_at);
+            const duration = getDuration(job.started_at, job.completed_at);
+            
+            // Create detailed timeline
+            let timeline = '';
+            if (job.created_at) {
+                timeline += `<div><strong>Created:</strong> ${formatDateTime(job.created_at)}</div>`;
+            }
+            if (job.scheduled_at) {
+                timeline += `<div><strong>Scheduled:</strong> ${formatDateTime(job.scheduled_at)}</div>`;
+            }
+            if (job.started_at) {
+                timeline += `<div><strong>Started:</strong> ${formatDateTime(job.started_at)}</div>`;
+            }
+            if (job.completed_at) {
+                timeline += `<div><strong>Completed:</strong> ${formatDateTime(job.completed_at)}</div>`;
+            }
+            
+            // Create refresh info
+            let refreshInfo = '';
+            if (job.allowed_refreshes && job.remaining_refreshes) {
+                refreshInfo = `<div style="font-size: 12px; color: #666; margin-top: 8px;">
+                    Refreshes: ${job.remaining_refreshes}/${job.allowed_refreshes} remaining
+                </div>`;
+            }
+            
+            return `
+                <div class="job-card" id="job-${job.job_id}">
+                    <div class="job-header">
+                        <div>
+                            <span class="job-id">${job.job_id.substring(0, 8)}...</span>
+                            <button class="copy-btn" onclick="copyToClipboard('${job.job_id}', this)">Copy</button>
+                        </div>
+                        <span class="job-status ${job.status}">${statusIcon} ${job.status.replace('_', ' ')}</span>
+                    </div>
+                    <div class="job-details">
+                        <strong>Type:</strong> ${job.job_type}<br>
+                        <div style="margin-top: 8px; font-size: 13px;">
+                            ${timeline}
+                        </div>
+                        ${job.error_message ? `<div class="error-message">Error: ${job.error_message}</div>` : ''}
+                        ${refreshInfo}
+                    </div>
+                    <div class="job-time">
+                        Created ${timeAgo}${duration ? ` • Duration: ${duration}` : ''}
+                    </div>
+                    <div class="job-actions">
+                        <button class="job-action-btn" onclick="refreshJobStatus('${job.job_id}')">🔄 Refresh</button>
+                        <button class="job-action-btn" onclick="toggleJobDetails('${job.job_id}')">📋 Details</button>
+                    </div>
+                    <div id="details-${job.job_id}" class="job-expanded-details" style="display: none; margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; border-left: 4px solid #007bff;">
+                        <h4 style="margin: 0 0 10px 0; color: #333;">Job Details</h4>
+                        <div style="font-family: monospace; font-size: 12px; line-height: 1.6;">
+                            <div><strong>Full Job ID:</strong> ${job.job_id}</div>
+                            <div><strong>Connection ID:</strong> ${job.connection_id || 'N/A'}</div>
+                            <div><strong>Provider:</strong> ${job.provider_id || 'N/A'}</div>
+                            <div><strong>Job Type:</strong> ${job.job_type}</div>
+                            <div><strong>Status:</strong> ${job.status}</div>
+                            ${job.job_url ? `<div><strong>Job URL:</strong> <a href="${job.job_url}" target="_blank">${job.job_url}</a></div>` : ''}
+                            <div style="margin-top: 10px;"><strong>Timeline:</strong></div>
+                            <div style="margin-left: 15px;">
+                                ${timeline || '<div>No timeline data available</div>'}
+                            </div>
+                            ${job.allowed_refreshes ? `
+                                <div style="margin-top: 10px;"><strong>Rate Limits:</strong></div>
+                                <div style="margin-left: 15px;">
+                                    <div>Allowed refreshes per hour: ${job.allowed_refreshes}</div>
+                                    <div>Remaining refreshes: ${job.remaining_refreshes}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': '⏳',
+                'in_progress': '🔄',
+                'complete': '✅',
+                'error': '❌',
+                'reauth_error': '🔐',
+                'permissions_error': '🚫'
+            };
+            return icons[status] || '❓';
+        }
+
+        function getTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            
+            try {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                if (diffMins < 1) return 'just now';
+                if (diffMins < 60) return `${diffMins} min ago`;
+                if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } catch (e) {
+                return 'Unknown time';
+            }
+        }
+
+        function getDuration(startTime, endTime) {
+            if (!startTime) return null;
+            
+            try {
+                const start = new Date(startTime);
+                const end = endTime ? new Date(endTime) : new Date();
+                const diffMs = end - start;
+                const diffSecs = Math.floor(diffMs / 1000);
+                const diffMins = Math.floor(diffSecs / 60);
+                
+                if (diffSecs < 60) return `${diffSecs}s`;
+                if (diffMins < 60) return `${diffMins}m ${diffSecs % 60}s`;
+                return `${Math.floor(diffMins / 60)}h ${diffMins % 60}m`;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function refreshJobStatus(jobId) {
+            try {
+                const response = await fetch(`/api/jobs/status/${jobId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('✅ Job status refreshed', 'success');
+                    await loadJobs();
+                } else {
+                    showMessage(`❌ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        function startAutoRefresh() {
+            if (jobRefreshInterval) {
+                clearInterval(jobRefreshInterval);
+            }
+            
+            if (activeJobs.size > 0) {
+                jobRefreshInterval = setInterval(async () => {
+                    if (activeJobs.size === 0) {
+                        clearInterval(jobRefreshInterval);
+                        jobRefreshInterval = null;
+                        return;
+                    }
+                    
+                    await loadJobs();
+                }, 10000); // Refresh every 10 seconds
+            }
+        }
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                button.textContent = '✓';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function formatDateTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZoneName: 'short'
+                });
+            } catch (e) {
+                return timestamp;
+            }
+        }
+
+        function toggleJobDetails(jobId) {
+            const detailsDiv = document.getElementById(`details-${jobId}`);
+            const button = event.target;
+            
+            if (detailsDiv.style.display === 'none') {
+                detailsDiv.style.display = 'block';
+                button.textContent = '📋 Hide Details';
+            } else {
+                detailsDiv.style.display = 'none';
+                button.textContent = '📋 Details';
+            }
+        }
+
+        function showMessage(message, type) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.error-message, .success-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            messageDiv.textContent = message;
+            
+            // Insert after the jobs section title
+            const jobsSection = document.getElementById('jobsSection');
+            const title = jobsSection.querySelector('.section-title');
+            title.insertAdjacentElement('afterend', messageDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const startJobBtn = document.getElementById('startJobBtn');
+            const refreshJobsBtn = document.getElementById('refreshJobsBtn');
+            
+            if (startJobBtn) {
+                startJobBtn.addEventListener('click', startDataSyncJob);
+            }
+            
+            if (refreshJobsBtn) {
+                refreshJobsBtn.addEventListener('click', loadJobs);
+            }
+            
+            // Load jobs on page load
+            loadJobs();
+        });
 
         // Close modal when clicking outside of it
         window.onclick = function(event) {
